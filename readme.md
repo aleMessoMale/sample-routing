@@ -38,21 +38,21 @@ It's also possible to receive data in a **paginated way**, passing URL Variables
 
 URLparams are optional. If no pagination is requested, all elements are returned.
 
-See **[Pagination](https://github.com/aleMessoMale/sample-routing/#pagination "Pagination Section")** for more info.
+See **[Pagination Section](https://github.com/aleMessoMale/sample-routing/#pagination "Pagination Section")** for more info.
 
-The only **version** supported is the v1, and, as you probably already noticed, is part of the exposed path. See **[Integration](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")** section to better understand how versioning has been managed.
+The only **version** supported is the v1, and, as you probably already noticed, is part of the exposed path. See **[Integration Section](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")** section to better understand how versioning has been managed.
 
 As already said, the web service is secured with **Spring Integration**. Here the **credentials** to provide, with Basic Authentication, in order to consume the exposed rest web service. These are present in the user.properties file:  
 username: INTEGRATION_REST_USER  
 password: 1Password  
 
-For more info see the **[Security](https://github.com/aleMessoMale/sample-routing/#security "Security Section")** section.  
+For more info see the **[Security Section](https://github.com/aleMessoMale/sample-routing/#security "Security Section")**.  
 
-Unit tests and Integration tests have been created. See the **[Test](https://github.com/aleMessoMale/sample-routing/#test "Test Section")** section for more info.
+Unit tests and Integration tests have been created. See the **[Test Section](https://github.com/aleMessoMale/sample-routing/#test "Test Section")** for more info.
 
 The provided project itself is a web project and it can be build using [Maven][] and the resulting war under `target/rest-integration-sample.war` can be deployed to Servlet Containers such as [Jetty][] or [Apache Tomcat][].
 
-**Environment property segregation** has been obtained through the use of Spring profiles. See the **[Environment segregation](https://github.com/aleMessoMale/sample-routing/#environment-segregation "Environment segregation Section")** section for more details.
+**Environment property segregation Section** has been obtained through the use of Spring profiles. See the **[Environment segregation Section](https://github.com/aleMessoMale/sample-routing/#environment-segregation "Environment segregation Section")** for more details.
 
 This sample has been crated with:   
 - **Spring Tool Suite**    
@@ -82,9 +82,9 @@ Pagination (and the relative URL Variables pageSize and pageNumber) is optional.
 ## Multi-layer project
 
 This project is composed by these layers:  
-- *Security*: A security layer has been put in place through [Spring Security]. For more info see the Spring Security configuration file [here](./src/main/webapp/WEB-INF/config/security-config.xml) or the relative section [Security](https://github.com/aleMessoMale/sample-routing/#security "Security Section")
-- *Web*: A servlet is called in order to fill the MDC Context of [LogBack] and allow a better logging experience. For more info See [here](./src/main/java/com/amazingsoftware/integration/samples/web/MDCInsertingServletFilter.java) the Servlet which fills the MDC Context, the whole [logback.xml](./src/main/resources/logback.xml) file or the specific **[Logs](https://github.com/aleMessoMale/sample-routing/#logs "Logs Section")** section.  
-- *Integration*: An Integration layer through [Spring Integration] has been put in place in order to orchestrate correctly messages received from the exposed Rest Web Service. For more info see the Spring Configuration file for the Integration features [here](./src/main/resources/META-INF/spring/integration/application-spring-integration.xml) or the relative section [Integration](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")  
+- *Security*: A security layer has been put in place through [Spring Security]. For more info see the Spring Security configuration file [here](./src/main/webapp/WEB-INF/config/security-config.xml) or the relative [Security Section](https://github.com/aleMessoMale/sample-routing/#security "Security Section")
+- *Web*: A servlet is called in order to fill the MDC Context of [LogBack] and allow a better logging experience. For more info See [here](./src/main/java/com/amazingsoftware/integration/samples/web/MDCInsertingServletFilter.java) the Servlet which fills the MDC Context, the whole [logback.xml](./src/main/resources/logback.xml) file or the specific **[Logs Section](https://github.com/aleMessoMale/sample-routing/#logs "Logs Section")**.  
+- *Integration*: An Integration layer through [Spring Integration] has been put in place in order to orchestrate correctly messages received from the exposed Rest Web Service. For more info see the Spring Configuration file for the Integration features [here](./src/main/resources/META-INF/spring/integration/application-spring-integration.xml) or the relative [Integration Section](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")  
 - *Facade*: A facade layer has been put in place in order to make easier the interaction with the below service layer.  
 - *Service*: A Service layer has been put in place. This layer is responsible for most of the business logic creating decoupling with the above Facade Layer.
 
@@ -304,7 +304,7 @@ According to that value, through a header-value-router whose configuration is sh
 	</int:header-value-router>
 ```
 
-At the time of writing, only v1 is supported. If version is not supported, Message is redirected to a particular channel and managed from a service activator for a specific management. Main entry point for the supported version for the country-currency service is the currencyFacade. See **[Multi-layer](https://github.com/aleMessoMale/sample-routing/#multi-layer-project "Multi-layer Section") project** section for more detail regarding the project structure.  
+At the time of writing, only v1 is supported. If version is not supported, Message is redirected to a particular channel and managed from a service activator for a specific management. Main entry point for the supported version for the country-currency service is the currencyFacade. See **[Multi-layer Project Section](https://github.com/aleMessoMale/sample-routing/#multi-layer-project "Multi-layer Section")** for more detail regarding the project structure.  
 Here another extract of the whole configuration file showing the main service activator.  
 
 ```xml
@@ -360,7 +360,7 @@ Managed errors at the time of writing are:
 - Uncorrect combinations of query string parameters (only one of them, not a number provided as a value, negative numbers and so on) return a "Parameter not supported"  error.  
 - Credentials not correct for the Spring Security Authentication, returns a 401 Error.   
 
-For further details about functional requirements, see the section **[Test](https://github.com/aleMessoMale/sample-routing/#test "Test Section")**, in a particular way the integration one. 
+For further details about functional requirements, see the **[Test Section](https://github.com/aleMessoMale/sample-routing/#test "Test Section")**, in a particular way the integration one. 
 
 ## Environment segregation
 
@@ -487,7 +487,7 @@ Both kind of tests use Spring's dependency injection and are associated to the t
 @ActiveProfiles("test")
 ```
 
-Unit test are relative to the service-layer (see **[Multi-layer](https://github.com/aleMessoMale/sample-routing/#multi-layer-project "Multi-layer Section") project** Section for multi-layer explaination) and Click [here](./src/test/java/test/com/amazingsoftware/integration/sample/rest/ServiceLayerTest.java) to see it in detail.
+Unit test are relative to the service-layer (see **[Multi-layer Project Section](https://github.com/aleMessoMale/sample-routing/#multi-layer-project "Multi-layer Section")** for multi-layer explaination) and Click [here](./src/test/java/test/com/amazingsoftware/integration/sample/rest/ServiceLayerTest.java) to see it in detail.
 
 **Integration tests** have been obtained through the integration of **[Maven Failsafe Plugin][]** and **[Jetty Maven Plugin][]**  to the [Maven][] default lifecycle phases involved in the integration tests matters.
 
