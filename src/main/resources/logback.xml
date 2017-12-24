@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="DEFAULT_FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>rest-integration-sample.log</file>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>rest-integration-sample.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<!-- each file should be at most 50MB, keep 30 days worth of history, 
+				but at most 500MB -->
+			<maxFileSize>50MB</maxFileSize>
+			<maxHistory>30</maxHistory>
+			<totalSizeCap>500MB</totalSizeCap>
+		</rollingPolicy>
+		<encoder>
+			<pattern>
+				%d|%5p|[%c{1}:%L]|%X{serviceName}|%X{operation}|%X{version}|%X{req.remoteHost}|%X{req.method}|%msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+
+	<appender name="SPRING_FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>spring.log</file>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>spring.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<!-- each file should be at most 50MB, keep 30 days worth of history, 
+				but at most 500MB -->
+			<maxFileSize>50MB</maxFileSize>
+			<maxHistory>30</maxHistory>
+			<totalSizeCap>500MB</totalSizeCap>
+		</rollingPolicy>
+		<encoder>
+			<pattern>
+				%d|%5p|[%c{1}:%L]|%X{serviceName}|%X{operation}|%X{version}|%X{req.remoteHost}|%X{req.method}|%msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<!-- Asynch logging in order to increase performances. -->
+
+	<appender name="ASYNC_DEFAULT_FILE" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="DEFAULT_FILE" />
+		<queueSize>8192</queueSize>
+		<discardingThreshold>0</discardingThreshold>
+		<maxFlushTime>0</maxFlushTime>
+	</appender>
+
+
+	<appender name="ASYNC_SPRING_FILE" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="SPRING_FILE" />
+		<queueSize>8192</queueSize>
+		<discardingThreshold>0</discardingThreshold>
+		<maxFlushTime>0</maxFlushTime>
+	</appender>
+
+	
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			 <pattern>
+				%d|%5p|[%c{1}:%L]|%X{serviceName}|%X{operation}|%X{version}|%X{req.remoteHost}|%X{req.method}|%msg%n
+			</pattern>
+		</encoder>
+		
+	</appender>
+
+
+	
+	<logger name="com.amazingsoftware" level="DEBUG">
+		<appender-ref ref="ASYNC_DEFAULT_FILE" />
+	</logger>
+
+	<logger name="org.springframework" level="WARN">
+		<appender-ref ref="ASYNC_SPRING_FILE" />
+	</logger>
+	
+	
+
+
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+	</root>
+
+
+</configuration>

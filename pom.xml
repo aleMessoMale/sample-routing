@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.amazingsoftware</groupId>
+	<artifactId>rest-integration-sample</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<!-- TODO -->
+	<name>Spring Integration Rest HTTP Sample</name>
+	<description>Spring Integration Rest HTTP Sample</description>
+	<build>
+		<finalName>rest-integration-sample</finalName>
+		<sourceDirectory>src/main/java</sourceDirectory>
+
+		<plugins>
+			<!-- Unit Tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.20.1</version>
+				<configuration>
+					<excludes>
+						<!-- naming convention of Integration Test Java file -->
+						<exclude>%regex[.*(IntTest).*]</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<!-- Integration Testing -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.20.1</version>
+				<configuration>
+					<includes>
+						<!-- naming convention of Integration Test Java file -->
+						<exclude>%regex[.*(IntTest).*]</exclude>
+					</includes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>integration-test</id>
+						<goals>
+							<goal>integration-test</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>verify</id>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Integration Testing -->
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<!-- <version>9.2.3</version> -->
+				<version>9.4.2.v20170220</version>
+				<configuration>
+					<webApp>
+						<contextPath>/rest-integration-sample</contextPath>
+					</webApp>
+					<httpConnector>
+						<port>8090</port>
+					</httpConnector>
+					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<stopPort>8005</stopPort>
+					<stopKey>STOP</stopKey>
+				</configuration>
+				<executions>
+					<execution>
+						<id>start-jetty</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<!-- stop any previous instance to free up the port -->
+							<goal>stop</goal>
+							<goal>start</goal>
+						</goals>
+						<configuration>
+							<scanIntervalSeconds>0</scanIntervalSeconds>
+							<daemon>true</daemon>
+						</configuration>
+					</execution>
+					<execution>
+						<id>stop-jetty</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- aspectj maven plugin -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>aspectj-maven-plugin</artifactId>
+				<version>1.10</version>
+				<executions>
+					<execution>
+						<configuration>
+							<source>1.8</source>
+							<complianceLevel>1.8</complianceLevel>
+						</configuration>
+						<goals>
+							<goal>compile</goal>       <!-- use this goal to weave all your main classes -->
+							<goal>test-compile</goal> <!-- use this goal to weave all your test classes -->
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.integration</groupId>
+				<artifactId>spring-integration-bom</artifactId>
+				<version>5.0.0.RELEASE</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-framework-bom</artifactId>
+				<version>5.0.0.RELEASE</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<developers>
+		<developer>
+			<id>aleMessoMale</id>
+			<name>Alessandro Casula</name>
+			<email>ale.casula@gmail.com</email>
+			<roles>
+				<role>Architect</role>
+			</roles>
+		</developer>
+
+	</developers>
+
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-http</artifactId>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+					<groupId>*</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jackson-module-kotlin</artifactId>
+					<groupId>com.fasterxml.jackson.module</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-boot-starter-jetty</artifactId>
+					<groupId>*</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- Per le capability Spring MVC -->
+		<!-- TODO Aggiungere @EnableWebMvc Normally you would add @EnableWebMvc 
+			for a Spring MVC app, but Spring Boot adds it automatically when it sees 
+			spring-webmvc on the classpath. This flags the application as a web application 
+			and activates key behaviors such as setting up a DispatcherServlet. -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+					<groupId>*</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jackson-module-kotlin</artifactId>
+					<groupId>com.fasterxml.jackson.module</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-boot-starter-jetty</artifactId>
+					<groupId>*</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- Marshalling -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-oxm</artifactId>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+					<groupId>*</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jackson-module-kotlin</artifactId>
+					<groupId>com.fasterxml.jackson.module</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-boot-starter-jetty</artifactId>
+					<groupId>*</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+					<groupId>*</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jackson-module-kotlin</artifactId>
+					<groupId>com.fasterxml.jackson.module</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-boot-starter-jetty</artifactId>
+					<groupId>*</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- AOP for logging -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>1.8.9</version>
+		</dependency>
+
+		<!-- Data binding -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.9.1</version>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+					<groupId>*</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jackson-module-kotlin</artifactId>
+					<groupId>com.fasterxml.jackson.module</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-boot-starter-jetty</artifactId>
+					<groupId>*</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- Security capabilities -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>5.0.0.RELEASE</version>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+					<groupId>*</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jackson-module-kotlin</artifactId>
+					<groupId>com.fasterxml.jackson.module</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-boot-starter-jetty</artifactId>
+					<groupId>*</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>5.0.0.RELEASE</version>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+					<groupId>*</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jackson-module-kotlin</artifactId>
+					<groupId>com.fasterxml.jackson.module</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>spring-boot-starter-jetty</artifactId>
+					<groupId>*</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-logging</artifactId>
+			<version>1.5.9.RELEASE</version>
+		</dependency>
+		<!-- JUnit for unit testing -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>jackson-module-kotlin</artifactId>
+					<groupId>com.fasterxml.jackson.module</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>*</artifactId>
+					<groupId>org.hamcrest</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- To get StringUtils and much more -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.0</version>
+		</dependency>
+		<!-- To access the HttpServletRequest -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+
+		
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<version>1.3</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>jackson-module-kotlin</artifactId>
+					<groupId>com.fasterxml.jackson.module</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>2.10.0</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>jackson-module-kotlin</artifactId>
+					<groupId>com.fasterxml.jackson.module</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>*</artifactId>
+					<groupId>org.hamcrest</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- Spring support for testing -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>jackson-module-kotlin</artifactId>
+					<groupId>com.fasterxml.jackson.module</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+
+
+	</dependencies>
+
+</project>

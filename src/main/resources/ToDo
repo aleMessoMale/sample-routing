@@ -1,0 +1,48 @@
+- Aggiungere log alla parte sviluppata.
+
+- cercare di capire come fare la navigazione fra sezioni
+
+vedere se si riesce ad aggiungere un po di codice in giro, ne ho già aggiunto abbastanza (direi che è ok, una lettura veloce).
+
+Manca solo la parte dell'environment.
+
+- readme: cosa scrivere: 
+	   
+	   #error handling
+	   - gestione errori centralizzata con canale apposito (error channel) del gateway 
+	     di spring integration attraverso builder per creazione json con struttura fissa da esporre al client. --> OK
+	   
+	   #security
+	   - rest securizzato con Spring Security e con criptazione della password tramite BCryptPasswordEncoder, ad oggi ritenuto il miglior sistema. --> OK 
+      
+       #pagination
+       - cache della prima chiamata alla sorgente dati rest nell'init e ad ogni chiamata se non ancora valorizzato, filtering tramite Java8 Streams. --> OK
+       - paginazione (pagina e dimensione della singola pagina) tramite query string --> OK
+       
+       #integration
+       - versionamento rest api su url e passaggio su header --> OK
+       - instradamento su service activator per versioni differenti. --> OK
+       - instradamento tramite spring-integration (http:inbound-gateway, header-value-router, service activator, ecc ecc.) --> OK
+       
+       #logs
+       - logback e log asincroni con rotazione per data e dimensione --> OK
+       - MDC Context valorizzato tramite Servlet all'ingresso dell'app. --> OK
+       - log tramite Aspect per accesso a determinati layer con printing dei parametri in ingresso e risultati ottenuti in uscita con tempo di esecuzione. --> OK
+       
+       - componente architetturale per la chiamata ai REST Services.
+       
+       #environment segregation
+       - ambientizzazione tramite profilo spring, creato anche profilo spring per i test. 
+         Profili diversi caricano properties e contesti Spring diversi, necessario passare variabile ambiente al tomcat per impostare ambiente: -Dspring.profiles.active="dev"
+         
+       #multi-layer project
+       - multi-layer architecture 
+         - orchestration tramite Spring Integration --> OK
+         - facade: facade design pattern per chiamare il service più corretto. --> OK
+         - service: si interfaccia con la sorgente dati rest e fornisce i dati sotto forma di JSON. --> OK
+         - decoupling with different domain objects mapping with generics and streams. --> OK
+       
+        #tests
+       - multi-layer test
+       		- service - JUnit (vedi se puoi aggiungere qualcosa, magari che è stata fatta con il contesto di spring che sale e con tutti i file di configuration)
+       		- integration testing through maven-failsafe-plugin and jetty-maven-plugin integration. ---> Fatta ma vedere se si può migliorare

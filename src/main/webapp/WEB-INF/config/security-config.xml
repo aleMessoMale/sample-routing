@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<security:global-method-security
+		secured-annotations="enabled" />
+
+	<!-- Configuration for Spring Security -->
+	<security:http auto-config="true" use-expressions="true"
+		realm="Rest Integration Sample" create-session="never">
+		<security:http-basic />
+		<security:intercept-url pattern='/services/currency-countries-info/*'
+			access="hasRole('ROLE_INTEGRATION_REST_USER')" />
+	</security:http>
+
+	<!-- In this example, we are using in memory authentication. The password 
+		encoder is BCryptPasswordEncoder that is considered so far the best password 
+		encoder to use. Username and password are store encrypted in the user.properties 
+		file, a unit test: CreateEncodedPasswordTest.getStringForPassword has been 
+		created to obtain the encoded password to write in the user.properties file. -->
+	<security:authentication-manager alias="authenticationManager">
+		<security:authentication-provider>
+			<security:password-encoder ref="passwordEncoder" />
+			<security:user-service properties="classpath:users.properties" />
+		</security:authentication-provider>
+	</security:authentication-manager>
+
+
+	<!-- BCryptPasswordEncoder is considered so far the best password encoder 
+		to use -->
+	<bean id="passwordEncoder"
+		class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+		<constructor-arg value="11" />
+	</bean>
+</beans>

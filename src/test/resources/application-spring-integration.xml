@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
+        http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm.xsd"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:oxm="http://www.springframework.org/schema/oxm" xmlns:int-http="http://www.springframework.org/schema/integration/http">
+
+	<int:annotation-config />
+
+	<!-- Inbound/Outbound Channels -->
+	<int:channel id="currencyCountriesRequest" />
+	<int:channel id="currencyCountriesResponse" />
+	<int:channel id="v1Channel" />
+	<int:channel id="unSupportedVersionChannel" />
+
+
+	<int-http:inbound-gateway id="inboundCurrencyCountriesGateway"
+		supported-methods="GET" request-channel="currencyCountriesRequest"
+		reply-channel="currencyCountriesResponse" mapped-response-headers="HTTP_RESPONSE_HEADERS"
+
+		path="/services/{version}/currency-countries-info" reply-timeout="50000">
+
+		<int-http:header name="version" expression="#pathVariables.version" />
+
+	</int-http:inbound-gateway>
+
+
+	<int:header-value-router input-channel="currencyCountriesRequest"
+		header-name="version">
+		<int:mapping value="v1" channel="v1Channel" />
+		<int:mapping value="v2" channel="unSupportedVersionChannel" />
+	</int:header-value-router>
+
+
+	<int:service-activator id="currencyServiceActivator"
+		input-channel="v1Channel" output-channel="currencyCountriesResponse"
+		ref="currencyFacade" method="getCurrenciesInfo" requires-reply="true"
+		send-timeout="60000" />
+
+	<int:service-activator id="notSupportedVersionBean"
+						   input-channel="unSupportedVersionChannel" output-channel="currencyCountriesResponse"
+						   ref="currencyFacade" method="notSupportedVersionErrorManagement" requires-reply="true"
+						   send-timeout="60000" />
+
+
+</beans>

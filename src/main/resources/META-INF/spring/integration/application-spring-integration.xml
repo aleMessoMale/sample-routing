@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
+        http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm.xsd"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:oxm="http://www.springframework.org/schema/oxm" xmlns:int-http="http://www.springframework.org/schema/integration/http">
+
+	<int:annotation-config />
+
+	<!-- Inbound/Outbound Channels -->
+	<int:channel id="currencyCountriesRequest" />
+	<int:channel id="currencyCountriesResponse" />
+	<int:channel id="v1Channel" />
+	<int:channel id="unSupportedVersionChannel" />
+
+	<!-- expose rest services -->
+	<!-- errors go in the relative channel -->
+	<int-http:inbound-gateway id="inboundCurrencyCountriesGateway"
+		supported-methods="GET" request-channel="currencyCountriesRequest"
+		reply-channel="currencyCountriesResponse" mapped-response-headers="HTTP_RESPONSE_HEADERS"
+		error-channel="errorChannel"
+		path="/services/{version}/currency-countries-info" reply-timeout="50000">
+
+		<!-- version provided in the path, is automatically copied in the message header. -->
+		<int-http:header name="version" expression="#pathVariables.version" />
+
+	</int-http:inbound-gateway>
+	
+	<!-- error channel management -->
+	<int:service-activator input-channel="errorChannel" ref="genericCurrencyServiceErrorManager" method="handleError"/>
+	
+
+	<!-- according to header message value, message goes in the right channel -->
+	<int:header-value-router input-channel="currencyCountriesRequest"
+		header-name="version" default-output-channel="unSupportedVersionChannel" resolution-required="false">
+		<int:mapping value="v1" channel="v1Channel" />
+		<int:mapping value="otherVersions" channel="unSupportedVersionChannel" />
+	</int:header-value-router>
+
+	<!-- service activator manage at facade level the message routed -->
+	<int:service-activator id="currencyServiceActivator"
+		input-channel="v1Channel" output-channel="currencyCountriesResponse"
+		ref="currencyFacade" method="getCurrenciesInfo" requires-reply="true"
+		send-timeout="60000" />
+	
+	<!-- this service activator manages the case of wrong version calling. -->
+	<int:service-activator id="notSupportedVersionBean"
+						   input-channel="unSupportedVersionChannel" output-channel="currencyCountriesResponse"
+						   ref="currencyFacade" method="notSupportedVersionErrorManagement" requires-reply="true"
+						   send-timeout="60000" />
+
+
+</beans>
