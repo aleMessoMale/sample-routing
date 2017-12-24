@@ -40,7 +40,7 @@ URLparams are optional. If no pagination is requested, all elements are returned
 
 See **[Pagination Section](https://github.com/aleMessoMale/sample-routing/#pagination "Pagination Section")** for more info.
 
-The only **version** supported is the v1, and, as you probably already noticed, is part of the exposed path. See **[Integration Section](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")** section to better understand how versioning has been managed.
+The only **version** supported is the v1, and, as you probably already noticed, is part of the exposed path. See **[Integration Section](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")** to better understand how versioning has been managed.
 
 As already said, the web service is secured with **Spring Integration**. Here the **credentials** to provide, with Basic Authentication, in order to consume the exposed rest web service. These are present in the user.properties file:  
 username: INTEGRATION_REST_USER  
