@@ -38,8 +38,8 @@
 	<!-- according to header message value, message goes in the right channel -->
 	<int:header-value-router input-channel="currencyCountriesRequest"
 		header-name="channel" default-output-channel="unSupportedChannel" resolution-required="false">
-		<int:mapping value="web" channel="webChannel" />
 		<int:mapping value="mobile" channel="mobileChannel" />
+		<int:mapping value="web" channel="webChannel" />
 		<int:mapping value="otherChannels" channel="unSupportedChannel" />
 	</int:header-value-router>
 
