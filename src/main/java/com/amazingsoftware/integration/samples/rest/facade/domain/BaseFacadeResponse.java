@@ -1,5 +1,7 @@
 package com.amazingsoftware.integration.samples.rest.facade.domain;
 
+import com.amazingsoftware.integration.samples.rest.Client;
+
 /**
  * Should contain base information that any facade-level response should contain.
  * 
@@ -8,6 +10,7 @@ package com.amazingsoftware.integration.samples.rest.facade.domain;
  * @author al.casula
  *
  */
-public class BaseResponseFacade {
+public class BaseFacadeResponse extends Client{
 	
+
 }

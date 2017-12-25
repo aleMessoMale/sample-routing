@@ -2,7 +2,7 @@ package com.amazingsoftware.integration.samples.rest.service.currency;
 
 import java.util.List;
 
-import com.amazingsoftware.integration.samples.rest.service.currency.domain.CountryInfoResponse;
+import com.amazingsoftware.integration.samples.rest.service.currency.domain.CountryInfoServiceResponse;
 
 /**
  * The facade-layer interface for the Currency Service.
@@ -23,7 +23,7 @@ public interface ICurrencyService {
 	 * 
 	 * @throws Exception
 	 */
-	List<CountryInfoResponse> getCurrenciesInfo(Integer pageNumber, Integer pageSizeNumber) throws Exception;
+	List<CountryInfoServiceResponse> getCurrenciesInfo(Integer pageNumber, Integer pageSizeNumber) throws Exception;
 	
 	/**
 	 * 
@@ -32,6 +32,6 @@ public interface ICurrencyService {
 	 * @return all the info relative to Country and relative currencies. 
 	 * @throws Exception
 	 */
-	List<CountryInfoResponse> getAllCurrenciesInfo() throws Exception;
+	List<CountryInfoServiceResponse> getAllCurrenciesInfo() throws Exception;
 
 }

@@ -24,7 +24,7 @@ import com.amazingsoftware.integration.samples.rest.builder.urlcurrency.IRestCou
 import com.amazingsoftware.integration.samples.rest.builder.urlcurrency.enums.FieldsToRecoverInCountryRest;
 import com.amazingsoftware.integration.samples.rest.service.BaseService;
 import com.amazingsoftware.integration.samples.rest.service.currency.ICurrencyService;
-import com.amazingsoftware.integration.samples.rest.service.currency.domain.CountryInfoResponse;
+import com.amazingsoftware.integration.samples.rest.service.currency.domain.CountryInfoServiceResponse;
 import com.amazingsoftware.integration.samples.rest.service.currency.helper.CurrencyServiceHelper;
 import com.amazingsoftware.integration.samples.rest.service.currency.validator.CurrencyServiceValidator;
 import com.amazingsoftware.integration.samples.utils.HttpUtils;
@@ -49,7 +49,7 @@ public class CurrencyServiceImpl extends BaseService implements ICurrencyService
 	@Autowired
 	CurrencyServiceHelper currencyServiceHelper;
 
-	private List<CountryInfoResponse> countryCurrenciesInfoResponse;
+	private List<CountryInfoServiceResponse> countryCurrenciesInfoResponse;
 
 	/**
 	 * Caching values in init method so that there's no need to explicitly
@@ -60,7 +60,7 @@ public class CurrencyServiceImpl extends BaseService implements ICurrencyService
 		countryCurrenciesInfoResponse = fillCountriesCurrenciesInfo();
 	}
 
-	protected List<CountryInfoResponse> getCountryCurrenciesInfoResponse() {
+	protected List<CountryInfoServiceResponse> getCountryCurrenciesInfoResponse() {
 		if (countryCurrenciesInfoResponse == null) {
 			countryCurrenciesInfoResponse = fillCountriesCurrenciesInfo();
 		}
@@ -69,7 +69,7 @@ public class CurrencyServiceImpl extends BaseService implements ICurrencyService
 	}
 	
 	@Override
-	public List<CountryInfoResponse> getAllCurrenciesInfo() throws Exception {
+	public List<CountryInfoServiceResponse> getAllCurrenciesInfo() throws Exception {
 		
 		Map<String, Object> responseHeaderMap = new HashMap<String, Object>();
 				
@@ -77,7 +77,7 @@ public class CurrencyServiceImpl extends BaseService implements ICurrencyService
 	}
 
 	@Override
-	public List<CountryInfoResponse> getCurrenciesInfo(Integer pageNumber, Integer pageSizeNumber)
+	public List<CountryInfoServiceResponse> getCurrenciesInfo(Integer pageNumber, Integer pageSizeNumber)
 			throws Exception {
 
 		/* Parameter validation first */
@@ -96,7 +96,7 @@ public class CurrencyServiceImpl extends BaseService implements ICurrencyService
 	 * This method is used to fill a list from the source rest service so that it can be used as cache is subsequent calls.
 	 * @return the List obtained from the call to source rest service.
 	 */
-	private List<CountryInfoResponse> fillCountriesCurrenciesInfo() {
+	private List<CountryInfoServiceResponse> fillCountriesCurrenciesInfo() {
 
 		HttpHeaders restHeaders = new HttpHeaders();
 		restHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -107,10 +107,10 @@ public class CurrencyServiceImpl extends BaseService implements ICurrencyService
 		String url = restCountriesUrlBuilder.buildFullUrl(FieldsToRecoverInCountryRest.CURRENCY,
 				FieldsToRecoverInCountryRest.NAME);
 
-		ParameterizedTypeReference<List<CountryInfoResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoResponse>>() {
+		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
 		};
 
-		ResponseEntity<List<CountryInfoResponse>> exchange;
+		ResponseEntity<List<CountryInfoServiceResponse>> exchange;
 
 		try {
 			/* perform rest call with a centralized method so that success, error and execution time are treated uniformally */
@@ -120,8 +120,8 @@ public class CurrencyServiceImpl extends BaseService implements ICurrencyService
 			return null;
 		}
 
-		List<CountryInfoResponse> countryListResponse = exchange != null ? exchange.getBody()
-				: new ArrayList<CountryInfoResponse>();
+		List<CountryInfoServiceResponse> countryListResponse = exchange != null ? exchange.getBody()
+				: new ArrayList<CountryInfoServiceResponse>();
 
 		logger.info("Currencies Info has been filled up correctly");
 

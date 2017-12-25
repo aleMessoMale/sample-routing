@@ -1,11 +1,9 @@
 package com.amazingsoftware.integration.samples.rest.facade.currency;
 
-import java.util.List;
-
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
 
-import com.amazingsoftware.integration.samples.rest.facade.currency.domain.CountryInfoResponseFacade;
+import com.amazingsoftware.integration.samples.rest.facade.currency.domain.CurrencyFacadeResponse;
 
 /**
  * The service-layer interface for the Currency Service.
@@ -23,7 +21,18 @@ public interface ICurrencyFacade {
 	 * @return Message containing info for the country and relative currency 
 	 * @throws Exception
 	 */
-	GenericMessage<List<CountryInfoResponseFacade>> getCurrenciesInfo(Message<?> inMessage) throws Exception;
+	GenericMessage<CurrencyFacadeResponse> getCurrenciesInfoForWeb(Message<?> inMessage) throws Exception;
+	
+	
+	/**
+	 * This method is exposed as service activator in case a call to the
+	 * /services/{version}/currency-countries-info endpoint need to be managed.
+	 * 
+	 * @param inMessage input Message
+	 * @return Message containing info for the country and relative currency 
+	 * @throws Exception
+	 */
+	GenericMessage<CurrencyFacadeResponse> getCurrenciesInfoForMobile(Message<?> inMessage) throws Exception;
 
 	
 	/**
@@ -32,5 +41,5 @@ public interface ICurrencyFacade {
 	 * @param inMessage Input message
 	 * @throws Exception
 	 */
-	void notSupportedVersionErrorManagement(Message<?> inMessage) throws Exception;
+	void notSupportedChannelErrorManagement(Message<?> inMessage) throws Exception;
 }

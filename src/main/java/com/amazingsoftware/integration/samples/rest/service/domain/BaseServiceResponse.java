@@ -7,6 +7,7 @@ package com.amazingsoftware.integration.samples.rest.service.domain;
  * @author al.casula
  *
  */
-public class BaseResponse {
+public class BaseServiceResponse {
 	
+
 }

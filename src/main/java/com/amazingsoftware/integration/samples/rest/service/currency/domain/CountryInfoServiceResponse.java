@@ -2,7 +2,7 @@ package com.amazingsoftware.integration.samples.rest.service.currency.domain;
 
 import java.util.List;
 
-import com.amazingsoftware.integration.samples.rest.service.domain.BaseResponse;
+import com.amazingsoftware.integration.samples.rest.service.domain.BaseServiceResponse;
 import com.amazingsoftware.integration.samples.utils.JsonSerializerWrapperUtil;
 
 /**
@@ -13,7 +13,7 @@ import com.amazingsoftware.integration.samples.utils.JsonSerializerWrapperUtil;
  * @author al.casula
  *
  */
-public class CountryInfoResponse extends BaseResponse {
+public class CountryInfoServiceResponse  {
 	
 	@Override
 	public String toString() {

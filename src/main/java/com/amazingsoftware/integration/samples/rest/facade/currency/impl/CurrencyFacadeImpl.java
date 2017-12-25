@@ -22,7 +22,8 @@ import com.amazingsoftware.integration.samples.consts.BaseServiceConst.HeaderMes
 import com.amazingsoftware.integration.samples.consts.BaseServiceConst.QueryStringParameters;
 import com.amazingsoftware.integration.samples.rest.facade.BaseFacade;
 import com.amazingsoftware.integration.samples.rest.facade.currency.ICurrencyFacade;
-import com.amazingsoftware.integration.samples.rest.facade.currency.domain.CountryInfoResponseFacade;
+import com.amazingsoftware.integration.samples.rest.facade.currency.domain.CountryInfoFacadeResponse;
+import com.amazingsoftware.integration.samples.rest.facade.currency.domain.CurrencyFacadeResponse;
 import com.amazingsoftware.integration.samples.rest.facade.currency.mapper.CurrencyMapper;
 import com.amazingsoftware.integration.samples.rest.service.currency.ICurrencyService;
 import com.amazingsoftware.integration.samples.utils.HttpUtils;
@@ -44,11 +45,27 @@ public class CurrencyFacadeImpl extends BaseFacade implements ICurrencyFacade {
 
 	@Autowired
 	CurrencyMapper currencyMapper;
+	
+	@Override
+	@Secured("ROLE_INTEGRATION_REST_USER")
+	public GenericMessage<CurrencyFacadeResponse> getCurrenciesInfoForMobile(Message<?> inMessage) throws Exception {
+		
+
+		
+		return this.getCurrenciesInfoForWeb(inMessage);
+		
+		
+//		return this.getCurrenciesInfoForWeb(inMessage);
+	}
+	
 
 	@Override
 	@Secured("ROLE_INTEGRATION_REST_USER")
-	public GenericMessage<List<CountryInfoResponseFacade>> getCurrenciesInfo(Message<?> inMessage) throws Exception {
+	public GenericMessage<CurrencyFacadeResponse> getCurrenciesInfoForWeb(Message<?> inMessage) throws Exception {
 
+		CurrencyFacadeResponse currencyFacadeResponse = this.createResponseFacade(CurrencyFacadeResponse.class, inMessage);
+		
+		
 		Map<String, Object> responseHeaderMap = new HashMap<String, Object>();
 		
 		/* Get the servlet request */
@@ -75,16 +92,24 @@ public class CurrencyFacadeImpl extends BaseFacade implements ICurrencyFacade {
 			/* If no pagination has been requested, call the getAllCurrenciesInfo service method */
 			if (pageSizeNumber == null && pageNumber == null) {
 				
+				List<CountryInfoFacadeResponse> countryInfoResponseList = currencyMapper.fromServiceListToFacadeList(
+						currencyService.getAllCurrenciesInfo(), CountryInfoFacadeResponse.class);
 				
-				return new GenericMessage<List<CountryInfoResponseFacade>>(currencyMapper.fromServiceListToFacadeList(
-						currencyService.getAllCurrenciesInfo(), CountryInfoResponseFacade.class) , responseHeaderMap);
+				currencyFacadeResponse.setCountryInfoList(countryInfoResponseList);
+				
+				return new GenericMessage<CurrencyFacadeResponse>(currencyFacadeResponse, responseHeaderMap);
 			}
 			
 			/* In case pagination is requested, call the paginated service layer method */
 			if (pageSizeNumber != null && pageNumber != null) {
-
-				return new GenericMessage<List<CountryInfoResponseFacade>>(currencyMapper.fromServiceListToFacadeList(
-						currencyService.getCurrenciesInfo(pageNumber, pageSizeNumber), CountryInfoResponseFacade.class),
+				
+				List<CountryInfoFacadeResponse> countryInfoResponseList = currencyMapper.fromServiceListToFacadeList(
+						currencyService.getCurrenciesInfo(pageNumber, pageSizeNumber), CountryInfoFacadeResponse.class);
+				
+				
+				currencyFacadeResponse.setCountryInfoList(countryInfoResponseList);
+				
+				return new GenericMessage<CurrencyFacadeResponse>(currencyFacadeResponse,
 						responseHeaderMap);
 			}
 
@@ -112,14 +137,14 @@ public class CurrencyFacadeImpl extends BaseFacade implements ICurrencyFacade {
 
 	@Override
 	@Secured("ROLE_INTEGRATION_REST_USER")
-	public void notSupportedVersionErrorManagement(Message<?> inMessage) throws Exception {
+	public void notSupportedChannelErrorManagement(Message<?> inMessage) throws Exception {
 
 		String version = httpUtils.getHeaderFromIntegrationMessage(inMessage, HeaderMessageKeys.MESSAGE_HEADER_VERSION);
 
 		logger.warn("Called wrong {} version", BaseServiceConst.WEB_APP_SERVICE_NAME);
 		logger.warn("Called with version {} which is not supported", version);
 
-		throw new IllegalArgumentException(BaseServiceConst.ErrorMessages.VERSION_NOT_SUPPORTED + version
+		throw new IllegalArgumentException(BaseServiceConst.ErrorMessages.CHANNEL_NOT_SUPPORTED + version
 				+ BaseServiceConst.MESSAGE_HTTP_STATUS_SEPARATOR + HttpStatus.NOT_FOUND);
 
 	}

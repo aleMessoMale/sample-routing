@@ -43,7 +43,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.amazingsoftware.integration.samples.consts.BaseServiceConst;
-import com.amazingsoftware.integration.samples.rest.service.currency.domain.CountryInfoResponse;
+import com.amazingsoftware.integration.samples.rest.service.currency.domain.CountryInfoServiceResponse;
 import com.amazingsoftware.integration.samples.utils.HttpUtils;
 import com.amazingsoftware.integration.samples.utils.NumberUtil;
 
@@ -96,7 +96,7 @@ public class CurrencyInfoIntTest {
 	@Autowired
 	private TestUtils testUtils;
 
-	private HttpMessageConverterExtractor<List<CountryInfoResponse>> responseExtractor;
+	private HttpMessageConverterExtractor<List<CountryInfoServiceResponse>> responseExtractor;
 	Logger logger = LoggerFactory.getLogger(CurrencyInfoIntTest.class);
 
 	@Rule
@@ -117,15 +117,15 @@ public class CurrencyInfoIntTest {
 				springSecurityPassword);
 		HttpEntity<Object> request = new HttpEntity<Object>(headers);
 
-		ParameterizedTypeReference<List<CountryInfoResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoResponse>>() {
+		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
 		};
 
-		ResponseEntity<List<CountryInfoResponse>> exchange;
+		ResponseEntity<List<CountryInfoServiceResponse>> exchange;
 
 		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
 
 		exchange = restTemplate.exchange(fullUrl, HttpMethod.GET, request, listOfCountryResponse);
-		List<CountryInfoResponse> countryListResponse = exchange.getBody();
+		List<CountryInfoServiceResponse> countryListResponse = exchange.getBody();
 
 		assertTrue(exchange.getStatusCode().equals(HttpStatus.OK));
 
@@ -158,17 +158,17 @@ public class CurrencyInfoIntTest {
 				springSecurityPassword);
 		HttpEntity<Object> request = new HttpEntity<Object>(headers);
 
-		ParameterizedTypeReference<List<CountryInfoResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoResponse>>() {
+		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
 		};
 
-		ResponseEntity<List<CountryInfoResponse>> exchange;
+		ResponseEntity<List<CountryInfoServiceResponse>> exchange;
 
 		fullUrl += queryString;
 
 		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
 
 		exchange = restTemplate.exchange(fullUrl, HttpMethod.GET, request, listOfCountryResponse);
-		List<CountryInfoResponse> countryListResponse = exchange.getBody();
+		List<CountryInfoServiceResponse> countryListResponse = exchange.getBody();
 
 		assertTrue(exchange.getStatusCode().equals(HttpStatus.OK));
 		assertEquals(NumberUtil.checkIntegerNumber(pageSize, null).intValue(), exchange.getBody().size());
@@ -193,15 +193,15 @@ public class CurrencyInfoIntTest {
 				springSecurityPassword);
 		HttpEntity<Object> request = new HttpEntity<Object>(headers);
 
-		ParameterizedTypeReference<List<CountryInfoResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoResponse>>() {
+		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
 		};
 
-		ResponseEntity<List<CountryInfoResponse>> exchange;
+		ResponseEntity<List<CountryInfoServiceResponse>> exchange;
 
 		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
 
 		exchange = restTemplate.exchange(fullUrl, HttpMethod.GET, request, listOfCountryResponse);
-		List<CountryInfoResponse> countryListResponse = exchange.getBody();
+		List<CountryInfoServiceResponse> countryListResponse = exchange.getBody();
 
 		assertTrue(exchange.getStatusCode().equals(HttpStatus.OK));
 		assertEquals(TestConsts.REST_COUNTRIES_RESPONSE_SIZE, exchange.getBody().size());
@@ -234,10 +234,10 @@ public class CurrencyInfoIntTest {
 				springSecurityPassword);
 		HttpEntity<Object> request = new HttpEntity<Object>(headers);
 
-		ParameterizedTypeReference<List<CountryInfoResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoResponse>>() {
+		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
 		};
 
-		ResponseEntity<List<CountryInfoResponse>> exchange;
+		ResponseEntity<List<CountryInfoServiceResponse>> exchange;
 
 		fullUrl += queryString;
 
@@ -277,10 +277,10 @@ public class CurrencyInfoIntTest {
 				springSecurityPassword);
 		HttpEntity<Object> request = new HttpEntity<Object>(headers);
 
-		ParameterizedTypeReference<List<CountryInfoResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoResponse>>() {
+		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
 		};
 
-		ResponseEntity<List<CountryInfoResponse>> exchange;
+		ResponseEntity<List<CountryInfoServiceResponse>> exchange;
 
 		fullUrl += queryString;
 
@@ -322,10 +322,10 @@ public class CurrencyInfoIntTest {
 				springSecurityPassword);
 		HttpEntity<Object> request = new HttpEntity<Object>(headers);
 
-		ParameterizedTypeReference<List<CountryInfoResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoResponse>>() {
+		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
 		};
 
-		ResponseEntity<List<CountryInfoResponse>> exchange;
+		ResponseEntity<List<CountryInfoServiceResponse>> exchange;
 
 		fullUrl += queryString;
 
@@ -367,10 +367,10 @@ public class CurrencyInfoIntTest {
 				springSecurityPassword);
 		HttpEntity<Object> request = new HttpEntity<Object>(headers);
 
-		ParameterizedTypeReference<List<CountryInfoResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoResponse>>() {
+		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
 		};
 
-		ResponseEntity<List<CountryInfoResponse>> exchange = null;
+		ResponseEntity<List<CountryInfoServiceResponse>> exchange = null;
 
 		fullUrl += queryString;
 
@@ -396,10 +396,10 @@ public class CurrencyInfoIntTest {
 				springSecurityPassword + "Wxx");
 		HttpEntity<Object> request = new HttpEntity<Object>(headers);
 
-		ParameterizedTypeReference<List<CountryInfoResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoResponse>>() {
+		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
 		};
 
-		ResponseEntity<List<CountryInfoResponse>> exchange = null;
+		ResponseEntity<List<CountryInfoServiceResponse>> exchange = null;
 
 		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
 
@@ -429,10 +429,10 @@ public class CurrencyInfoIntTest {
 				springSecurityPassword);
 		HttpEntity<Object> request = new HttpEntity<Object>(headers);
 
-		ParameterizedTypeReference<List<CountryInfoResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoResponse>>() {
+		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
 		};
 
-		ResponseEntity<List<CountryInfoResponse>> exchange = null;
+		ResponseEntity<List<CountryInfoServiceResponse>> exchange = null;
 
 		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
 

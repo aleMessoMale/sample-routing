@@ -1,6 +1,13 @@
-- Aggiungere log alla parte sviluppata.
+- trasformare la parte multiversione nella parte multi-piattaforma. 
+ - nell'header viene copiato il channel (web o mobile) e reindirizzato su due diversi canali a loro volta vanno su due service-activator
+   di facade diversi (due metodi della facade differenti). --> OK
+ - restituiscono i due metodi della facade, il canale nella response, la property channel la mettiamo nella BaseResponse. 
+ - aggiornare di conseguenza il readme.md
+ - aggiornare di conseguenze anche i tests di integrazione (solo uno con la versione). 
+- rendere la versione una property esterna e bloccata sul int-http:inbound-gateway --> OK
+- specificare che i servizi siano agnostici rispetto al canale.
 
-- cercare di capire come fare la navigazione fra sezioni
+
 
 vedere se si riesce ad aggiungere un po di codice in giro, ne ho già aggiunto abbastanza (direi che è ok, una lettura veloce).
 

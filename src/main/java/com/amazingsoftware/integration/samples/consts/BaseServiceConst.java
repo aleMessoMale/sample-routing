@@ -18,6 +18,12 @@ public class BaseServiceConst {
 
 	public final class HeaderMessageKeys {
 		public static final String MESSAGE_HEADER_VERSION = "version";
+		public static final String MESSAGE_HEADER_CHANNEL = "channel";
+	}
+	
+	public final class Channels {
+		public static final String WEB_CHANNEL = "web";
+		public static final String MOBILE_CHANNEL = "mobile";
 	}
 
 	
@@ -45,6 +51,7 @@ public class BaseServiceConst {
 		public static final String CALLED_URL = "calledUrl";
 		public static final String VERSION = "version";
 		public static final String OPERATION = "operation";
+		public static final String CHANNEL = "channel";
 	}
 
 	/**
@@ -74,6 +81,7 @@ public class BaseServiceConst {
 		public static final String PARAMETER_NOT_SUPPORTED = "Parameter supplied not supported";
 		public static final String GENERIC_ERROR = "Generic Error";
 		public static final String ILLEGAL_STATE = "Illegal Application State";
+		public static final String CHANNEL_NOT_SUPPORTED = "Channel not supported: ";
 	}
 	
 	

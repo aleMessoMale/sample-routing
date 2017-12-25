@@ -38,7 +38,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import com.amazingsoftware.integration.samples.consts.BaseServiceConst;
 import com.amazingsoftware.integration.samples.rest.service.currency.ICurrencyService;
-import com.amazingsoftware.integration.samples.rest.service.currency.domain.CountryInfoResponse;
+import com.amazingsoftware.integration.samples.rest.service.currency.domain.CountryInfoServiceResponse;
 import com.amazingsoftware.integration.samples.utils.NumberUtil;
 
 import test.com.amazingsoftware.integration.sample.config.ApplicationConfigPropertyTest;
@@ -75,7 +75,7 @@ public class ServiceLayerTest {
 	@Test
 	public void testSizeIsCorrectWithNoPagination() throws Exception {
 
-		List<CountryInfoResponse> currenciesInfo = currencyService.getAllCurrenciesInfo();
+		List<CountryInfoServiceResponse> currenciesInfo = currencyService.getAllCurrenciesInfo();
 
 		assertNotNull(currenciesInfo);
 		assertEquals(NumberUtil.checkIntegerNumber(TestConsts.REST_COUNTRIES_RESPONSE_SIZE, null),
@@ -95,7 +95,7 @@ public class ServiceLayerTest {
 	@Test
 	public void testElementContentIsCorrectWithNoPagination() throws Exception {
 
-		List<CountryInfoResponse> currenciesInfo = currencyService.getAllCurrenciesInfo();
+		List<CountryInfoServiceResponse> currenciesInfo = currencyService.getAllCurrenciesInfo();
 
 		assertNotNull(currenciesInfo);
 		assertEquals(NumberUtil.checkIntegerNumber(TestConsts.REST_COUNTRIES_RESPONSE_SIZE, null),
@@ -122,7 +122,7 @@ public class ServiceLayerTest {
 		String pageNumber = "2";
 		String pageSize = "5";
 
-		List<CountryInfoResponse> currenciesInfo = currencyService.getCurrenciesInfo(new Integer(pageNumber),
+		List<CountryInfoServiceResponse> currenciesInfo = currencyService.getCurrenciesInfo(new Integer(pageNumber),
 				new Integer(pageSize));
 
 		assertNotNull(currenciesInfo);
@@ -141,7 +141,7 @@ public class ServiceLayerTest {
 		String pageNumber = "2";
 		String pageSize = "5";
 
-		List<CountryInfoResponse> currenciesInfo = currencyService.getCurrenciesInfo(new Integer(pageNumber),
+		List<CountryInfoServiceResponse> currenciesInfo = currencyService.getCurrenciesInfo(new Integer(pageNumber),
 				new Integer(pageSize));
 
 		assertNotNull(currenciesInfo);
@@ -160,7 +160,7 @@ public class ServiceLayerTest {
 		String pageNumber = "50";
 		String pageSize = "10";
 
-		List<CountryInfoResponse> currenciesInfo = currencyService.getCurrenciesInfo(new Integer(pageNumber),
+		List<CountryInfoServiceResponse> currenciesInfo = currencyService.getCurrenciesInfo(new Integer(pageNumber),
 				new Integer(pageSize));
 
 		assertNotNull(currenciesInfo);
@@ -183,7 +183,7 @@ public class ServiceLayerTest {
 		String pageNumber = "7";
 		String pageSize = "40";
 
-		List<CountryInfoResponse> currenciesInfo = currencyService.getCurrenciesInfo(new Integer(pageNumber),
+		List<CountryInfoServiceResponse> currenciesInfo = currencyService.getCurrenciesInfo(new Integer(pageNumber),
 				new Integer(pageSize));
 
 		assertNotNull(currenciesInfo);

@@ -13,8 +13,10 @@
 	<!-- Inbound/Outbound Channels -->
 	<int:channel id="currencyCountriesRequest" />
 	<int:channel id="currencyCountriesResponse" />
-	<int:channel id="v1Channel" />
-	<int:channel id="unSupportedVersionChannel" />
+	<int:channel id="webChannel" />
+	<int:channel id="unSupportedChannel" /> 
+	<int:channel id="mobileChannel" />
+	
 
 	<!-- expose rest services -->
 	<!-- errors go in the relative channel -->
@@ -22,10 +24,10 @@
 		supported-methods="GET" request-channel="currencyCountriesRequest"
 		reply-channel="currencyCountriesResponse" mapped-response-headers="HTTP_RESPONSE_HEADERS"
 		error-channel="errorChannel"
-		path="/services/{version}/currency-countries-info" reply-timeout="50000">
+		path="/services/{channel}/${application.version}/currency-countries-info" reply-timeout="50000">
 
 		<!-- version provided in the path, is automatically copied in the message header. -->
-		<int-http:header name="version" expression="#pathVariables.version" />
+		<int-http:header name="channel" expression="#pathVariables.channel" />
 
 	</int-http:inbound-gateway>
 	
@@ -35,21 +37,28 @@
 
 	<!-- according to header message value, message goes in the right channel -->
 	<int:header-value-router input-channel="currencyCountriesRequest"
-		header-name="version" default-output-channel="unSupportedVersionChannel" resolution-required="false">
-		<int:mapping value="v1" channel="v1Channel" />
-		<int:mapping value="otherVersions" channel="unSupportedVersionChannel" />
+		header-name="channel" default-output-channel="unSupportedChannel" resolution-required="false">
+		<int:mapping value="web" channel="webChannel" />
+		<int:mapping value="mobile" channel="mobileChannel" />
+		<int:mapping value="otherChannels" channel="unSupportedChannel" />
 	</int:header-value-router>
 
-	<!-- service activator manage at facade level the message routed -->
-	<int:service-activator id="currencyServiceActivator"
-		input-channel="v1Channel" output-channel="currencyCountriesResponse"
-		ref="currencyFacade" method="getCurrenciesInfo" requires-reply="true"
+	<!-- service activator manage at facade level the message routed, web channel-->
+	<int:service-activator id="currencyServiceActivatorWeb"
+		input-channel="webChannel" output-channel="currencyCountriesResponse"
+		ref="currencyFacade" method="getCurrenciesInfoForWeb" requires-reply="true"
+		send-timeout="60000" />
+	
+	<!-- service activator manage at facade level the message routed, mobile channel-->
+	<int:service-activator id="currencyServiceActivatorMobile"
+		input-channel="mobileChannel" output-channel="currencyCountriesResponse"
+		ref="currencyFacade" method="getCurrenciesInfoForMobile" requires-reply="true"
 		send-timeout="60000" />
 	
 	<!-- this service activator manages the case of wrong version calling. -->
-	<int:service-activator id="notSupportedVersionBean"
-						   input-channel="unSupportedVersionChannel" output-channel="currencyCountriesResponse"
-						   ref="currencyFacade" method="notSupportedVersionErrorManagement" requires-reply="true"
+	<int:service-activator id="notSupportedChannelBean"
+						   input-channel="unSupportedChannel" output-channel="currencyCountriesResponse"
+						   ref="currencyFacade" method="notSupportedChannelErrorManagement" requires-reply="true"
 						   send-timeout="60000" />
 
 

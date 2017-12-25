@@ -2,7 +2,7 @@ package com.amazingsoftware.integration.samples.rest.facade.currency.domain;
 
 import java.util.List;
 
-import com.amazingsoftware.integration.samples.rest.facade.domain.BaseResponseFacade;
+import com.amazingsoftware.integration.samples.rest.facade.domain.BaseFacadeResponse;
 import com.amazingsoftware.integration.samples.utils.JsonSerializerWrapperUtil;
 /**
  * This object contains the information of facade-layer relative to country and relative currency.
@@ -12,7 +12,7 @@ import com.amazingsoftware.integration.samples.utils.JsonSerializerWrapperUtil;
  * @author al.casula
  *
  */
-public class CountryInfoResponseFacade extends BaseResponseFacade {
+public class CountryInfoFacadeResponse extends BaseFacadeResponse {
 	
 	@Override
 	public String toString() {
