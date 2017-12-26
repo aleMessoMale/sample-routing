@@ -3,6 +3,7 @@
 This sample demonstrates how you can send an HTTP request to a **[Spring Integration][]** HTTP service. This sample also uses **[Spring Security][]** for HTTP Basic authentication. With the HTTP Path facility, the client program can send requests with URL Variables.
 
 Feed by a Rest Web Service: http://restcountries.eu/rest/v2/, the rest web service created is able to return a list of countries with their relative currency values.  
+  
 The solution provided is multi-version and multi-channel web application. Channel and relative service version is part of the exposed path.  
 
 Here an example of the URL to invoke: *http://localhost:8080/rest-integration-sample/services/web/v1/currency-countries-info*   
@@ -60,7 +61,7 @@ The only **version** supported is the v1, and, as you probably already noticed, 
 
 The only **channels** supported are web and mobile. See **[Integration Section](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")** to better understand how multi-channel features have been managed.
 
-As already said, the web service is secured with **Spring Integration**. Here the **credentials** to provide, with Basic Authentication, in order to consume the exposed rest web service. These are present in the [user.properties] file:  
+As already said, the web service is secured with **Spring Security**. Here the **credentials** to provide, with Basic Authentication, in order to consume the exposed rest web service. These are present in the [user.properties] file:  
 username: INTEGRATION_REST_USER  
 password: 1Password  
 
@@ -102,17 +103,17 @@ Pagination (and the relative URL Variables pageSize and pageNumber) is optional.
 This project is composed by these layers:  
 - *Security*: A security layer has been put in place through [Spring Security]. For more info see the Spring Security configuration file [here](./src/main/webapp/WEB-INF/config/security-config.xml) or the relative [Security Section](https://github.com/aleMessoMale/sample-routing/#security "Security Section")
 - *Web*: A servlet is called in order to fill the MDC Context of [LogBack] and allow a better logging experience. For more info See [here](./src/main/java/com/amazingsoftware/integration/samples/web/MDCInsertingServletFilter.java) the Servlet which fills the MDC Context, the whole [logback.xml](./src/main/resources/logback.xml) file or the specific **[Logs Section](https://github.com/aleMessoMale/sample-routing/#logs "Logs Section")**.  
-- *Integration*: An Integration layer through [Spring Integration] has been put in place in order to orchestrate correctly messages received from the exposed Rest Web Service, manages different versions and channels. For more info see the Spring Configuration file for the Integration features [here](./src/main/resources/META-INF/spring/integration/application-spring-integration.xml) or the relative [Integration Section](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")  
+- *Integration*: An Integration layer through [Spring Integration] has been put in place in order to orchestrate correctly messages received from the exposed Rest Web Service, managing different versions and channels. For more info see the Spring Configuration file for the Integration features [here](./src/main/resources/META-INF/spring/integration/application-spring-integration.xml) or the relative [Integration Section](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")  
 - *Facade*: A facade layer has been put in place in order to make easier the interaction with the below service layer.  
 - *Service*: A Service layer has been put in place. This layer is responsible for most of the business logic creating decoupling with the above Facade Layer.
 
-An arch package has been written to manage most common operations such as logging, errors, mapping between layers, rest invokation.  
+An arch package has been written to manage most common operations such as logging, errors, mapping between layers and rest invokation.  
 
 An extensible [Mapper](./src/main/java/com/amazingsoftware/integration/samples/arch/mapper/impl/Mapper.java) class (optimazed with Streams) has been written in order to make easier the mapping operations between domain objects of different layers so that is possible to keep different layers loosely coupled as much as possible.  
 
 Architecture guarantees that every Response contains channel and version that has been used. 
 
-A rest package has been created also and contains subpackages for facade and service layer and further packages are expected one for each operation (now only currency exists). 
+A rest package has been created also and contains subpackages for facade and service layers and further packages are expected one for each service (now only currency exists). 
 
 A config package has been written for configuration files, with subpackages for different environments. See the **[Environment segregation Section](https://github.com/aleMessoMale/sample-routing/#environment-segregation "Environment segregation Section")** for more details.  
 
@@ -350,7 +351,9 @@ According to that value, through a header-value-router whose configuration is sh
 	</int:header-value-router>
 ```
 
-At the time of writing, only web and mobile channels are supported. If provided channel is not supported, Message is redirected to a particular channel and managed from a service activator for a specific management. Main entry point for the supported channels and version for the country-currency service is the currencyFacade. See **[Multi-layer Project Section](https://github.com/aleMessoMale/sample-routing/#multi-layer-project "Multi-layer Section")** for more detail regarding the project structure.  
+At the time of writing, only web and mobile channels are supported. If provided channel is not supported, Message is redirected to a particular channel and managed from a service activator for a specific management.  
+
+Main entry point for the supported channels and version for the country-currency service is the currencyFacade. See **[Multi-layer Project Section](https://github.com/aleMessoMale/sample-routing/#multi-layer-project "Multi-layer Section")** for more detail regarding the project structure.  
 Here another extract of the whole configuration file showing the main service activators:
 
 ```xml
@@ -540,7 +543,9 @@ Both kind of tests use Spring's dependency injection and are associated to the t
 @ActiveProfiles("test")
 ```
 
-Unit test are relative to the service-layer (see **[Multi-layer Project Section](https://github.com/aleMessoMale/sample-routing/#multi-layer-project "Multi-layer Section")** for multi-layer explaination) and Click [here](./src/test/java/test/com/amazingsoftware/integration/sample/rest/ServiceLayerTest.java) to see it in detail.
+Unit test are relative to the service-layer (see **[Multi-layer Project Section](https://github.com/aleMessoMale/sample-routing/#multi-layer-project "Multi-layer Section")** for multi-layer explaination).   
+
+Click [here](./src/test/java/test/com/amazingsoftware/integration/sample/rest/ServiceLayerTest.java) to see it in detail.
 
 **Integration tests** have been obtained through the integration of **[Maven Failsafe Plugin][]** and **[Jetty Maven Plugin][]**  to the [Maven][] default lifecycle phases involved in the integration tests matters.
 
