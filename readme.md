@@ -381,7 +381,7 @@ As shown in the first extract, any error raised is automatically redirected to t
 
 
 ```java
- @ServiceActivator
+ 	@ServiceActivator
     public Message<ErrorResponse> handleError(Message<MessageHandlingException> message) {
     	
     	Map<String, Object> responseHeaderMap = new HashMap<String, Object>();
@@ -458,7 +458,7 @@ public class ApplicationConfigDev {
 At the PostConstruct phase of the Spring Service Bean injection, the whole list of countries and relative currencies are loaded from the source rest at the URL: http://restcountries.eu/rest/v2/ and stored in a list as a **cache** as shown below:  
 
 ```java
-/**
+	/**
 	 * Caching values in init method so that there's no need to explicitly
 	 * call the rest service at every invokation of the services methods. We expect these data to change rarely.
 	 */
@@ -475,7 +475,7 @@ Subsequent invokation of the service return:
 Follows an extract of the [main class](./src/main/java/com/amazingsoftware/integration/samples/utils/FilterUtils.java) utility involved for filtering:  
 
 ```java
-/**
+	/**
 	 * This method filters a given list for the provided indexes.
 	 * 
 	 * @param listToFilter
@@ -551,7 +551,7 @@ Click [here](./src/test/java/test/com/amazingsoftware/integration/sample/rest/Se
 
 Here the relevant section of the pom.xml relative to the Integration tests:
 ```xml
-<!-- Integration Testing -->
+			<!-- Integration Testing -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
