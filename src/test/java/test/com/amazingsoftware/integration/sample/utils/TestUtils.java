@@ -30,8 +30,6 @@ import test.com.amazingsoftware.integration.sample.consts.IntegrationEnv;
  *
  */
 @Component
-@ContextConfiguration(classes = { ContextLoaderListenerConfigTest.class}, loader = AnnotationConfigContextLoader.class)
-//@ActiveProfiles("test")
 public class TestUtils {
 	
 	@Autowired

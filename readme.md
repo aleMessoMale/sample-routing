@@ -3,7 +3,7 @@
 This sample demonstrates how you can send an HTTP request to a **[Spring Integration][]** HTTP service. This sample also uses **[Spring Security][]** for HTTP Basic authentication. With the HTTP Path facility, the client program can send requests with URL Variables.
 
 Feed by a Rest Web Service: http://restcountries.eu/rest/v2/, the rest web service created is able to return a list of countries with their relative currency values.  
-The solution provided is multi-version and multi-channel. Channel and relative service version is part of the exposed path.  
+The solution provided is multi-version and multi-channel web application. Channel and relative service version is part of the exposed path.  
 
 Here an example of the URL to invoke: *http://localhost:8080/rest-integration-sample/services/web/v1/currency-countries-info*   
 Supported Http Verb is GET.   
@@ -90,7 +90,7 @@ A **Basic Authentication** with [Spring Security][] has been put in place. Provi
 
 For testing purpose, you can use a Rest Client as [PostMan][] and call the subsequent URL with the GET Http Verb: *http://localhost:8080/rest-integration-sample/services/web/v1/currency-countries-info?pageSize=10&pageNumber=5*  
 
-This is an example of paginated response and returns the fifth page and the page will have a size of ten elements. 
+This is an example of paginated response and returns the fifth page and the page will have a size of ten elements, calling the version v1 of the web service for the web channel.  
 
 Pagination (and the relative URL Variables pageSize and pageNumber) is optional. If no pagination is provided, all values are returned.    
 
@@ -102,11 +102,24 @@ Pagination (and the relative URL Variables pageSize and pageNumber) is optional.
 This project is composed by these layers:  
 - *Security*: A security layer has been put in place through [Spring Security]. For more info see the Spring Security configuration file [here](./src/main/webapp/WEB-INF/config/security-config.xml) or the relative [Security Section](https://github.com/aleMessoMale/sample-routing/#security "Security Section")
 - *Web*: A servlet is called in order to fill the MDC Context of [LogBack] and allow a better logging experience. For more info See [here](./src/main/java/com/amazingsoftware/integration/samples/web/MDCInsertingServletFilter.java) the Servlet which fills the MDC Context, the whole [logback.xml](./src/main/resources/logback.xml) file or the specific **[Logs Section](https://github.com/aleMessoMale/sample-routing/#logs "Logs Section")**.  
-- *Integration*: An Integration layer through [Spring Integration] has been put in place in order to orchestrate correctly messages received from the exposed Rest Web Service. For more info see the Spring Configuration file for the Integration features [here](./src/main/resources/META-INF/spring/integration/application-spring-integration.xml) or the relative [Integration Section](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")  
+- *Integration*: An Integration layer through [Spring Integration] has been put in place in order to orchestrate correctly messages received from the exposed Rest Web Service, manages different versions and channels. For more info see the Spring Configuration file for the Integration features [here](./src/main/resources/META-INF/spring/integration/application-spring-integration.xml) or the relative [Integration Section](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")  
 - *Facade*: A facade layer has been put in place in order to make easier the interaction with the below service layer.  
 - *Service*: A Service layer has been put in place. This layer is responsible for most of the business logic creating decoupling with the above Facade Layer.
 
-An extensible [Mapper](./src/main/java/com/amazingsoftware/integration/samples/arch/mapper/impl/Mapper.java) class (optimazed with Streams) has been written in order to make easier the mapping operations between domain objects of different layers so that is possible to keep different layers loosely coupled as much as possible.
+An arch package has been written to manage most common operations such as logging, errors, mapping between layers, rest invokation.  
+
+An extensible [Mapper](./src/main/java/com/amazingsoftware/integration/samples/arch/mapper/impl/Mapper.java) class (optimazed with Streams) has been written in order to make easier the mapping operations between domain objects of different layers so that is possible to keep different layers loosely coupled as much as possible.  
+
+Architecture guarantees that every Response contains channel and version that has been used. 
+
+A rest package has been created also and contains subpackages for facade and service layer and further packages are expected one for each operation (now only currency exists). 
+
+A config package has been written for configuration files, with subpackages for different environments. See the **[Environment segregation Section](https://github.com/aleMessoMale/sample-routing/#environment-segregation "Environment segregation Section")** for more details.  
+
+An utils package has been created for contains util classes for most common operations such as collection filtering, http management, Json Serialization, Log filtering and number management.  
+
+A web package contains so far the Servlet for the MDC Context filling, see **[Logs Section](https://github.com/aleMessoMale/sample-routing/#logs "Logs Section")** for more details.  
+
 
 ## Security
 
@@ -146,17 +159,19 @@ The access to the service activator method is secured and the caller must be aut
 
 ```java
 @Override
-@Secured("ROLE_INTEGRATION_REST_USER")
-public GenericMessage<List<CountryInfoResponseFacade>> getCurrenciesInfo(Message<?> inMessage) throws Exception {
+	@Secured("ROLE_INTEGRATION_REST_USER")
+	public GenericMessage<CurrencyFacadeResponse> getCurrenciesInfoForWeb(Message<?> inMessage) throws Exception {
 
-       Map<String, Object> responseHeaderMap = new HashMap<String, Object>();
+		CurrencyFacadeResponse currencyFacadeResponse = this.createResponseFacade(CurrencyFacadeResponse.class, inMessage);
+		
+		
+		Map<String, Object> responseHeaderMap = new HashMap<String, Object>();
 		
 		/* Get the servlet request */
 		HttpServletRequest req = httpUtils.getServletRequest();
 		
 		/* Get the version from the Message Header */
 		String version = httpUtils.getHeaderFromIntegrationMessage(inMessage, HeaderMessageKeys.MESSAGE_HEADER_VERSION);
-
 		...
 		...
 }
@@ -177,17 +192,22 @@ Below the main method involved:
 	 * 
 	 * @param httpServletRequest
 	 */
-	protected void populateMDCContext(HttpServletRequest httpServletRequest) {
+		protected void populateMDCContext(HttpServletRequest httpServletRequest) {
 
 		if (httpServletRequest.getRequestURL().toString().split("//").length > 0
-				&& httpServletRequest.getRequestURL().toString().split("//")[1].split("/").length > 4) {
-			String operation = httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[4];
-			String version = httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[3];
+				&& httpServletRequest.getRequestURL().toString().split("//")[1].split("/").length > 5) {
+			String version = httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[4];
+			
+			
+			String channel = httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[3];
+			String operation = httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[5];
 
 			MDC.put(BaseServiceConst.Mdc.OPERATION, operation);
 			MDC.put(BaseServiceConst.Mdc.VERSION, version);
 			MDC.put(BaseServiceConst.Mdc.SERVICE_NAME,
 					httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[1]);
+			MDC.put(BaseServiceConst.Mdc.CHANNEL,
+					channel);
 		}
 
 	}
@@ -195,8 +215,9 @@ Below the main method involved:
 
 Follows the relevant information put in the **MDC Context** (also automatically obtained by LogBack itself):  
 - serviceName: the name of the webapp, in this case *rest-integration-sample*  
-- operation: the name of the called rest operation.  
-- version: the version actually supported is v1.  
+- operation: the name of the called rest operation. 
+- channel: the channel associated to the executing call.  
+- version: the version associated to the executing call. The only supported version is v1.  
 - remoteHost: the IP Address of the caller.  
 - method: the HTTP Method used.  
 
@@ -219,7 +240,7 @@ What follow is the configuration of a default appender:
 		</rollingPolicy>
 		<encoder>
 			<pattern>
-				%d|%5p|[%c{1}:%L]|%X{serviceName}|%X{operation}|%X{version}|%X{req.remoteHost}|%X{req.method}|%msg%n
+				%d|%5p|[%c{1}:%L]|%X{serviceName}|%X{operation}|%X{channel}|%X{version}|%X{req.remoteHost}|%X{req.method}|%msg%n
 			</pattern>
 		</encoder>
 	</appender>
@@ -228,7 +249,7 @@ extracted from the main [logback.xml](./src/main/resources/logback.xml) file.
 
 Here a single line of logs:  
 ```xml
-2017-12-22 15:59:16,245| INFO|[c.a.i.s.r.s.c.i.CurrencyServiceImpl:86]|rest-integration-sample|currency-countries-info|v1|127.0.0.1|GET|getCurrenciesInfo called for page: 2 and size: 10
+2017-12-26 11:48:39,239| INFO|[c.a.i.s.r.s.c.i.CurrencyServiceImpl:86]|rest-integration-sample|currency-countries-info|web|v1|127.0.0.1|GET|getCurrenciesInfo called for page: 2 and size: 10
 ```
 
 Another feature added for logging is the automatic **logging with Aspects**.
@@ -288,47 +309,61 @@ Here the main method involved:
 Follows a log line written automatically with Aspects:  
 
 ```xml
-2017-12-22 16:01:39,744| INFO|[c.a.i.s.a.a.l.LogAspect:95]|rest-integration-sample|currency-countries-info|v1|127.0.0.1|GET|Exiting: com.amazingsoftware.integration.samples.rest.service.currency.impl.CurrencyServiceImpl.getCurrenciesInfo, Return: [{"name":"Cambodia","currencies":[{"code":"KHR","name":"Cambodian riel","symbol":"?"},{"code":"USD","name":"United States dollar","symbol":"$"}]}, {"name":"Cameroon","currencies":[{"code":"XAF","name":"Central African CFA franc","symbol":"Fr"}]}, {"name":"Canada","currencies":[{"code":"CAD","name":"Canadian dollar","symbol":"$"}]}, {"name":"Cabo Verde","currencies":[{"code":"CVE","name":"Cape Verdean escudo","symbol":"Esc"}]}, {"name":"Cayman Islands","currencies":[{"code":"KYD","name":"Cayman Islands dollar","symbol":"$"}]}, {"name":"Central African Republic","currencies":[{"code":"XAF","name":"Central African CFA franc","symbol":"Fr"}]}, {"name":"Chad","currencies":[{"code":"XAF","name":"Central African CFA franc","symbol":"Fr"}]}, {"name":"Chile","currencies":[{"code":"CLP","name":"Chilean peso","symbol":"$"}]}, {"name":"China","currencies":[{"code":"CNY","name":"Chinese yuan","symbol":"¥"}]}, {"name":"Christmas Island","currencies":[{"code":"AUD","name":"Australian dollar","symbol":"$"}]}], Executed in: 11 ms
+2017-12-26 12:20:33,759| INFO|[c.a.i.s.a.a.l.LogAspect:95]|rest-integration-sample|currency-countries-info|web|v1|0:0:0:0:0:0:0:1|GET|Exiting: com.amazingsoftware.integration.samples.rest.service.currency.impl.CurrencyServiceImpl.getCurrenciesInfo, Return: [{"name":"Bouvet Island","currencies":[{"code":"NOK","name":"Norwegian krone","symbol":"kr"}]}, {"name":"Brazil","currencies":[{"code":"BRL","name":"Brazilian real","symbol":"R$"}]}, {"name":"British Indian Ocean Territory","currencies":[{"code":"USD","name":"United States dollar","symbol":"$"}]}, {"name":"United States Minor Outlying Islands","currencies":[{"code":"USD","name":"United States Dollar","symbol":"$"}]}, {"name":"Virgin Islands (British)","currencies":[{"name":"[D]","symbol":"$"},{"code":"USD","name":"United States dollar","symbol":"$"}]}, {"name":"Virgin Islands (U.S.)","currencies":[{"code":"USD","name":"United States dollar","symbol":"$"}]}, {"name":"Brunei Darussalam","currencies":[{"code":"BND","name":"Brunei dollar","symbol":"$"},{"code":"SGD","name":"Singapore dollar","symbol":"$"}]}, {"name":"Bulgaria","currencies":[{"code":"BGN","name":"Bulgarian lev","symbol":"??"}]}, {"name":"Burkina Faso","currencies":[{"code":"XOF","name":"West African CFA franc","symbol":"Fr"}]}, {"name":"Burundi","currencies":[{"code":"BIF","name":"Burundian franc","symbol":"Fr"}]}], Executed in: 8 ms
 ```
 
 ## Integration
 
 This sample uses a **[Spring Integration][]** HTTP service exposing a REST web service supporting GET Method.
-Through Integration has been managed also **Service Versioning** and **Error Management**.
+Through Integration has been managed also **Service Versioning**, **Multi-Channel Management** and **Error Management**.
 
 
 Here the inbound-gateway configuration, part of the whole configuration file linked [here](./src/main/resources/META-INF/spring/integration/application-spring-integration.xml).
 
 ```xml
-<int-http:inbound-gateway id="inboundCurrencyCountriesGateway"
+	<!-- expose rest services -->
+	<!-- errors go in the relative channel -->
+	<int-http:inbound-gateway id="inboundCurrencyCountriesGateway"
 		supported-methods="GET" request-channel="currencyCountriesRequest"
 		reply-channel="currencyCountriesResponse" mapped-response-headers="HTTP_RESPONSE_HEADERS"
 		error-channel="errorChannel"
-		path="/services/{version}/currency-countries-info" reply-timeout="50000">
+		path="/services/{channel}/${application.version}/currency-countries-info" reply-timeout="50000">
 
-		<int-http:header name="version" expression="#pathVariables.version" />
+		<!-- channel provided in the path, is automatically copied in the message header. -->
+		<int-http:header name="channel" expression="#pathVariables.channel" />
 
 	</int-http:inbound-gateway>
 ```
 
-Version provided in the path is automatically copied in the message header.
+Version exposed is taken from a property file and is segregated for different environment through the use of Spring Profiles. See the **[Environment segregation Section](https://github.com/aleMessoMale/sample-routing/#environment-segregation "Environment segregation Section")** for more details.  
+
+Channel provided in the path is automatically copied in the message header.
 According to that value, through a header-value-router whose configuration is shown below, Message is routed to a different channel and managed from a different service activator. 
 
 ```xml
+<!-- according to header message value, message goes in the right channel -->
 	<int:header-value-router input-channel="currencyCountriesRequest"
-		header-name="version" default-output-channel="unSupportedVersionChannel" resolution-required="false">
-		<int:mapping value="v1" channel="v1Channel" />
-		<int:mapping value="otherVersions" channel="unSupportedVersionChannel" />
+		header-name="channel" default-output-channel="unSupportedChannel" resolution-required="false">
+		<int:mapping value="mobile" channel="mobileChannel" />
+		<int:mapping value="web" channel="webChannel" />
+		<int:mapping value="otherChannels" channel="unSupportedChannel" />
 	</int:header-value-router>
 ```
 
-At the time of writing, only v1 is supported. If version is not supported, Message is redirected to a particular channel and managed from a service activator for a specific management. Main entry point for the supported version for the country-currency service is the currencyFacade. See **[Multi-layer Project Section](https://github.com/aleMessoMale/sample-routing/#multi-layer-project "Multi-layer Section")** for more detail regarding the project structure.  
-Here another extract of the whole configuration file showing the main service activator.  
+At the time of writing, only web and mobile channels are supported. If provided channel is not supported, Message is redirected to a particular channel and managed from a service activator for a specific management. Main entry point for the supported channels and version for the country-currency service is the currencyFacade. See **[Multi-layer Project Section](https://github.com/aleMessoMale/sample-routing/#multi-layer-project "Multi-layer Section")** for more detail regarding the project structure.  
+Here another extract of the whole configuration file showing the main service activators:
 
 ```xml
-	<int:service-activator id="currencyServiceActivator"
-		input-channel="v1Channel" output-channel="currencyCountriesResponse"
-		ref="currencyFacade" method="getCurrenciesInfo" requires-reply="true"
+	<!-- service activator manage at facade level the message routed, web channel-->
+	<int:service-activator id="currencyServiceActivatorWeb"
+		input-channel="webChannel" output-channel="currencyCountriesResponse"
+		ref="currencyFacade" method="getCurrenciesInfoForWeb" requires-reply="true"
+		send-timeout="60000" />
+	
+	<!-- service activator manage at facade level the message routed, mobile channel-->
+	<int:service-activator id="currencyServiceActivatorMobile"
+		input-channel="mobileChannel" output-channel="currencyCountriesResponse"
+		ref="currencyFacade" method="getCurrenciesInfoForMobile" requires-reply="true"
 		send-timeout="60000" />
 ```
 
@@ -374,7 +409,7 @@ As it is possible to see an [ErrorBuilder](./src/main/java/com/amazingsoftware/i
 
 
 Managed errors at the time of writing are:   
-- Call to other versions return a "Version not Supported" error.  
+- Call to channel different from web and mobile return a "Channel not Supported" error.  
 - Uncorrect combinations of query string parameters (only one of them, not a number provided as a value, negative numbers and so on) return a "Parameter not supported"  error.  
 - Credentials not correct for the Spring Security Authentication, returns a 401 Error.   
 
@@ -434,7 +469,7 @@ At the PostConstruct phase of the Spring Service Bean injection, the whole list 
 Subsequent invokation of the service return:  
 - the whole list if pagination is not set.  
 - a part of the list, filtered through Streams, if pagination is set.     
-Follows an extract of the main [Util](./src/main/java/com/amazingsoftware/integration/samples/utils/FilterUtils.java) filtering class involved for filtering:  
+Follows an extract of the [main class](./src/main/java/com/amazingsoftware/integration/samples/utils/FilterUtils.java) utility involved for filtering:  
 
 ```java
 /**
@@ -580,13 +615,13 @@ Here the relevant section of the pom.xml relative to the Integration tests:
 ```
 extracted from the whole **[pom.xml](./pom.xml)**.
 
-During integration tests, a Jetty Server is started with the just built war artifact and an Integration test: [CurrencyInfoIntTest.java][], has been created to cover most relevant requirements, stated in the JavaDoc's test, as shown below in this extract:
+During integration tests, a Jetty Server is started with the just built war artifact and an Integration test, [CurrencyInfoIntTest.java][], has been created to cover most relevant requirements, stated in the JavaDoc's test, as shown below in this extract:
 
 ```java
-/**
+     /**
 	 * tests that calling the rest service exposed by the integration test
 	 * environment, with pagination, response has an Http Status of OK, size is
-	 * equal to page size and element are correct.
+	 * equal to page size and elements content are correct.
 	 * 
 	 * 
 	 * @throws Exception
@@ -595,7 +630,7 @@ During integration tests, a Jetty Server is started with the just built war arti
 	public void testCallCountryCurrenciesRestWithPaginationReturnsPageSizeElementsWithCorrectContent()
 			throws Exception {
 
-		String fullUrl = testUtils.getIntegrationEnvFullUrl();
+		String fullUrl = testUtils.getWebIntegrationEnvFullUrl();
 
 		final String pageNum = "2";
 		final String pageSize = "10";
@@ -608,28 +643,23 @@ During integration tests, a Jetty Server is started with the just built war arti
 
 		HttpHeaders headers = testUtils.getHttpHeadersWithUserCredentials(springSecurityUsername,
 				springSecurityPassword);
-		HttpEntity<Object> request = new HttpEntity<Object>(headers);
-
-		ParameterizedTypeReference<List<CountryInfoResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoResponse>>() {
-		};
-
-		ResponseEntity<List<CountryInfoResponse>> exchange;
-
 		fullUrl += queryString;
-
-		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
-
-		exchange = restTemplate.exchange(fullUrl, HttpMethod.GET, request, listOfCountryResponse);
-		List<CountryInfoResponse> countryListResponse = exchange.getBody();
+		
+		ResponseEntity<CurrencyFacadeResponse> exchange = testUtils.executeRestCall(headers,fullUrl,HttpMethod.GET,CurrencyFacadeResponse.class);
+		
 
 		assertTrue(exchange.getStatusCode().equals(HttpStatus.OK));
-		assertEquals(NumberUtil.checkIntegerNumber(pageSize, null).intValue(), exchange.getBody().size());
-		assertEquals("Argentina", exchange.getBody().get(0).getName());
+		assertEquals(BaseServiceConst.Channels.WEB_CHANNEL, exchange.getBody().getChannel());
+		assertEquals(testUtils.getIntegrationEnv().getCurrencyVersion(), exchange.getBody().getVersion());
+		assertEquals(NumberUtil.checkIntegerNumber(pageSize, null).intValue(), exchange.getBody().getCountryInfoList().size());
+		assertEquals("Argentina", exchange.getBody().getCountryInfoList().get(0).getName());
 
 	}
 ```
 
-The test uses Spring's [RestTemplate][] to assemble and send HTTP requests. The *Server*, on the other hand, is using Spring Integration's HTTP Endpoint configuration.
+The test uses Spring's [RestTemplate][] to assemble and send HTTP requests. The *Server*, on the other hand, is using Spring Integration's HTTP Endpoint configuration.  
+
+A **[Test Util class](./src/test/java/test/com/amazingsoftware/integration/sample/utils/TestUtils.java)** has been written for most common operations.
 
 [Apache Tomcat]: http://tomcat.apache.org/
 [Jetty]: http://www.eclipse.org/jetty/

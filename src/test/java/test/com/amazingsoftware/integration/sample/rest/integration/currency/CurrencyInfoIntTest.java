@@ -129,7 +129,7 @@ public class CurrencyInfoIntTest {
 	/**
 	 * tests that calling the rest service exposed by the integration test
 	 * environment, with pagination, response has an Http Status of OK, size is
-	 * equal to page size and element are correct.
+	 * equal to page size and elements content are correct.
 	 * 
 	 * 
 	 * @throws Exception
