@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 
 import com.amazingsoftware.integration.samples.consts.BaseServiceConst;
 
@@ -22,8 +24,7 @@ import com.amazingsoftware.integration.samples.consts.BaseServiceConst;
  *
  */
 public class MDCInsertingServletFilter extends ch.qos.logback.classic.helpers.MDCInsertingServletFilter {
-
-
+	
 	private static final Logger logger = LoggerFactory.getLogger(MDCInsertingServletFilter.class);
 
 	@Override
@@ -50,6 +51,7 @@ public class MDCInsertingServletFilter extends ch.qos.logback.classic.helpers.MD
 		MDC.remove(BaseServiceConst.Mdc.SERVICE_NAME);
 		MDC.remove(BaseServiceConst.Mdc.OPERATION);
 		MDC.remove(BaseServiceConst.Mdc.VERSION);
+		MDC.remove(BaseServiceConst.Mdc.CHANNEL);
 	}
 
 	
@@ -63,6 +65,8 @@ public class MDCInsertingServletFilter extends ch.qos.logback.classic.helpers.MD
 		if (httpServletRequest.getRequestURL().toString().split("//").length > 0
 				&& httpServletRequest.getRequestURL().toString().split("//")[1].split("/").length > 5) {
 			String version = httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[4];
+			
+			
 			String channel = httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[3];
 			String operation = httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[5];
 

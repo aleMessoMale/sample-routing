@@ -26,7 +26,7 @@
 		error-channel="errorChannel"
 		path="/services/{channel}/${application.version}/currency-countries-info" reply-timeout="50000">
 
-		<!-- version provided in the path, is automatically copied in the message header. -->
+		<!-- channel provided in the path, is automatically copied in the message header. -->
 		<int-http:header name="channel" expression="#pathVariables.channel" />
 
 	</int-http:inbound-gateway>

@@ -12,7 +12,7 @@ import com.amazingsoftware.integration.samples.utils.JsonSerializerWrapperUtil;
  * @author al.casula
  *
  */
-public class CountryInfoFacadeResponse extends BaseFacadeResponse {
+public class CountryInfoFacadeResponse {
 	
 	@Override
 	public String toString() {

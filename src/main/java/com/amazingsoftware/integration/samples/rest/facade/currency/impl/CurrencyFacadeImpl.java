@@ -139,12 +139,12 @@ public class CurrencyFacadeImpl extends BaseFacade implements ICurrencyFacade {
 	@Secured("ROLE_INTEGRATION_REST_USER")
 	public void notSupportedChannelErrorManagement(Message<?> inMessage) throws Exception {
 
-		String version = httpUtils.getHeaderFromIntegrationMessage(inMessage, HeaderMessageKeys.MESSAGE_HEADER_VERSION);
+		String channel = httpUtils.getHeaderFromIntegrationMessage(inMessage, HeaderMessageKeys.MESSAGE_HEADER_CHANNEL);
 
-		logger.warn("Called wrong {} version", BaseServiceConst.WEB_APP_SERVICE_NAME);
-		logger.warn("Called with version {} which is not supported", version);
+		logger.warn("Called wrong {} channel", BaseServiceConst.WEB_APP_SERVICE_NAME);
+		logger.warn("Called with channel {} which is not supported", channel);
 
-		throw new IllegalArgumentException(BaseServiceConst.ErrorMessages.CHANNEL_NOT_SUPPORTED + version
+		throw new IllegalArgumentException(BaseServiceConst.ErrorMessages.CHANNEL_NOT_SUPPORTED + channel
 				+ BaseServiceConst.MESSAGE_HTTP_STATUS_SEPARATOR + HttpStatus.NOT_FOUND);
 
 	}

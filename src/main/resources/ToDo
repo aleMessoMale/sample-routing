@@ -1,11 +1,14 @@
 - trasformare la parte multiversione nella parte multi-piattaforma. 
  - nell'header viene copiato il channel (web o mobile) e reindirizzato su due diversi canali a loro volta vanno su due service-activator
    di facade diversi (due metodi della facade differenti). --> OK
- - restituiscono i due metodi della facade, il canale nella response, la property channel la mettiamo nella BaseResponse. 
+ - restituiscono i due metodi della facade, il canale nella response, la property channel la mettiamo nella BaseResponse. --> OK 
+ - gestione version not supported, da gestire a livello di gestore centralizzato degli errori perché non arriva nemmeno alla facade. Se la versione che recupero
+   dall'MDC è diversa da quella della properties tira su errore preciso.
  - aggiornare di conseguenza il readme.md
+    - specificare che i servizi siano agnostici rispetto al canale.
  - aggiornare di conseguenze anche i tests di integrazione (solo uno con la versione). 
 - rendere la versione una property esterna e bloccata sul int-http:inbound-gateway --> OK
-- specificare che i servizi siano agnostici rispetto al canale.
+
 
 
 
