@@ -16,7 +16,7 @@
 		</rollingPolicy>
 		<encoder>
 			<pattern>
-				%d|%5p|[%c{1}:%L]|%X{serviceName}|%X{operation}|%X{channel}|%X{version}|%X{req.remoteHost}|%X{req.method}|%msg%n
+				%d|%5p|[%c{1}:%L]|%X{application}|%X{serviceName}|%X{channel}|%X{version}|%X{req.remoteHost}|%X{req.method}|%msg%n
 			</pattern>
 		</encoder>
 	</appender>
@@ -38,7 +38,7 @@
 		</rollingPolicy>
 		<encoder>
 			<pattern>
-				%d|%5p|[%c{1}:%L]|%X{serviceName}|%X{operation}|%X{channel}|%X{version}|%X{req.remoteHost}|%X{req.method}|%msg%n
+				%d|%5p|[%c{1}:%L]|%X{application}|%X{serviceName}|%X{channel}|%X{version}|%X{req.remoteHost}|%X{req.method}|%msg%n
 			</pattern>
 		</encoder>
 	</appender>
@@ -64,7 +64,7 @@
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			 <pattern>
-				%d|%5p|[%c{1}:%L]|%X{serviceName}|%X{operation}|%X{channel}|%X{version}|%X{req.remoteHost}|%X{req.method}|%msg%n
+				%d|%5p|[%c{1}:%L]|%X{application}|%X{serviceName}|%X{channel}|%X{version}|%X{req.remoteHost}|%X{req.method}|%msg%n
 			</pattern>
 		</encoder>
 		

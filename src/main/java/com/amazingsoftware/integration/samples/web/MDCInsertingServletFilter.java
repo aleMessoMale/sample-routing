@@ -68,11 +68,11 @@ public class MDCInsertingServletFilter extends ch.qos.logback.classic.helpers.MD
 			
 			
 			String channel = httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[3];
-			String operation = httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[5];
+			String service = httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[5];
 
-			MDC.put(BaseServiceConst.Mdc.OPERATION, operation);
+			MDC.put(BaseServiceConst.Mdc.SERVICE_NAME, service);
 			MDC.put(BaseServiceConst.Mdc.VERSION, version);
-			MDC.put(BaseServiceConst.Mdc.SERVICE_NAME,
+			MDC.put(BaseServiceConst.Mdc.APP_NAME,
 					httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[1]);
 			MDC.put(BaseServiceConst.Mdc.CHANNEL,
 					channel);

@@ -193,7 +193,7 @@ Below the main method involved:
 	 * 
 	 * @param httpServletRequest
 	 */
-		protected void populateMDCContext(HttpServletRequest httpServletRequest) {
+	protected void populateMDCContext(HttpServletRequest httpServletRequest) {
 
 		if (httpServletRequest.getRequestURL().toString().split("//").length > 0
 				&& httpServletRequest.getRequestURL().toString().split("//")[1].split("/").length > 5) {
@@ -201,11 +201,11 @@ Below the main method involved:
 			
 			
 			String channel = httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[3];
-			String operation = httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[5];
+			String service = httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[5];
 
-			MDC.put(BaseServiceConst.Mdc.OPERATION, operation);
+			MDC.put(BaseServiceConst.Mdc.SERVICE_NAME, service);
 			MDC.put(BaseServiceConst.Mdc.VERSION, version);
-			MDC.put(BaseServiceConst.Mdc.SERVICE_NAME,
+			MDC.put(BaseServiceConst.Mdc.APP_NAME,
 					httpServletRequest.getRequestURL().toString().split("//")[1].split("/")[1]);
 			MDC.put(BaseServiceConst.Mdc.CHANNEL,
 					channel);
@@ -215,8 +215,8 @@ Below the main method involved:
 ```
 
 Follows the relevant information put in the **MDC Context** (also automatically obtained by LogBack itself):  
-- serviceName: the name of the webapp, in this case *rest-integration-sample*  
-- operation: the name of the called rest operation. 
+- application: the name of the webapp, in this case *rest-integration-sample*  
+- service: the name of the called rest service. 
 - channel: the channel associated to the executing call.  
 - version: the version associated to the executing call. The only supported version is v1.  
 - remoteHost: the IP Address of the caller.  
@@ -241,7 +241,7 @@ What follow is the configuration of a default appender:
 		</rollingPolicy>
 		<encoder>
 			<pattern>
-				%d|%5p|[%c{1}:%L]|%X{serviceName}|%X{operation}|%X{channel}|%X{version}|%X{req.remoteHost}|%X{req.method}|%msg%n
+				%d|%5p|[%c{1}:%L]|%X{application}|%X{serviceName}|%X{channel}|%X{version}|%X{req.remoteHost}|%X{req.method}|%msg%n
 			</pattern>
 		</encoder>
 	</appender>
@@ -250,7 +250,7 @@ extracted from the main [logback.xml](./src/main/resources/logback.xml) file.
 
 Here a single line of logs:  
 ```xml
-2017-12-26 11:48:39,239| INFO|[c.a.i.s.r.s.c.i.CurrencyServiceImpl:86]|rest-integration-sample|currency-countries-info|web|v1|127.0.0.1|GET|getCurrenciesInfo called for page: 2 and size: 10
+2017-12-26 16:09:40,981| INFO|[c.a.i.s.r.s.c.i.CurrencyServiceImpl:86]|rest-integration-sample|currency-countries-info|mobile|v1|127.0.0.1|GET|getCurrenciesInfo called for page: 4 and size: 10
 ```
 
 Another feature added for logging is the automatic **logging with Aspects**.

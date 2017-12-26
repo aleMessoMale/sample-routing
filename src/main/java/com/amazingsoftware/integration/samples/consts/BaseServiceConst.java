@@ -47,6 +47,7 @@ public class BaseServiceConst {
 	 */
 	public final class Mdc {
 
+		public static final String APP_NAME = "application";
 		public static final String SERVICE_NAME = "serviceName";
 		public static final String CALLED_URL = "calledUrl";
 		public static final String VERSION = "version";
