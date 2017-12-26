@@ -138,7 +138,8 @@ For the relative test case see [here](./src/test/java/test/com/amazingsoftware/i
 In this example, we are using in memory authentication. The password encoder is BCryptPasswordEncoder that is considered so far the best password encoder to use.  
 
 ```xml
-<security:authentication-manager alias="authenticationManager">
+
+    <security:authentication-manager alias="authenticationManager">
 		<security:authentication-provider>
 			<security:password-encoder ref="passwordEncoder" />
 			<security:user-service properties="classpath:users.properties" />
@@ -381,7 +382,8 @@ As shown in the first extract, any error raised is automatically redirected to t
 
 
 ```java
-  @ServiceActivator
+    
+    @ServiceActivator
     public Message<ErrorResponse> handleError(Message<MessageHandlingException> message) {
     	
     	Map<String, Object> responseHeaderMap = new HashMap<String, Object>();
@@ -623,7 +625,8 @@ extracted from the whole **[pom.xml](./pom.xml)**.
 During integration tests, a Jetty Server is started with the just built war artifact and an Integration test, [CurrencyInfoIntTest.java][], has been created to cover most relevant requirements, stated in the JavaDoc's test, as shown below in this extract:
 
 ```java
-     /**
+
+    /**
 	 * tests that calling the rest service exposed by the integration test
 	 * environment, with pagination, response has an Http Status of OK, size is
 	 * equal to page size and elements content are correct.
