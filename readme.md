@@ -2,35 +2,51 @@
 
 This sample demonstrates how you can send an HTTP request to a **[Spring Integration][]** HTTP service. This sample also uses **[Spring Security][]** for HTTP Basic authentication. With the HTTP Path facility, the client program can send requests with URL Variables.
 
-Feed by a Rest Web Service: http://restcountries.eu/rest/v2/, the rest web service created is able to return a list of countries with their relative currency values.
- 
-Here the URL to invoke: *http://localhost:8080/rest-integration-sample/services/v1/currency-countries-info*   
+Feed by a Rest Web Service: http://restcountries.eu/rest/v2/, the rest web service created is able to return a list of countries with their relative currency values.  
+The solution provided is multi-version and multi-channel. Channel and relative service version is part of the exposed path.  
+
+Here an example of the URL to invoke: *http://localhost:8080/rest-integration-sample/services/web/v1/currency-countries-info*   
 Supported Http Verb is GET.   
 
-
-Here an example of correct response:
+Here an extract of a correct response:
 ```json
-[
-    {
-        "name": "Nicaragua",
-        "currencies": [
-            {
-                "code": "NIO",
-                "name": "Nicaraguan córdoba",
-                "symbol": "C$"
-            }
-        ]
-    },{
-        "name": "Niger",
-        "currencies": [
-            {
-                "code": "XOF",
-                "name": "West African CFA franc",
-                "symbol": "Fr"
-            }
-        ]
-    } and so on...
- ] 
+{
+    "version": "v1",
+    "channel": "web",
+    "countryInfoList": [
+        {
+            "name": "Bouvet Island",
+            "currencies": [
+                {
+                    "code": "NOK",
+                    "name": "Norwegian krone",
+                    "symbol": "kr"
+                }
+            ]
+        },
+        {
+            "name": "Brazil",
+            "currencies": [
+                {
+                    "code": "BRL",
+                    "name": "Brazilian real",
+                    "symbol": "R$"
+                }
+            ]
+        },
+        {
+            "name": "British Indian Ocean Territory",
+            "currencies": [
+                {
+                    "code": "USD",
+                    "name": "United States dollar",
+                    "symbol": "$"
+                }
+            ]
+        }, 
+        and so on...
+     ]
+}
 ```
 
 
@@ -40,9 +56,11 @@ URLparams are optional. If no pagination is requested, all elements are returned
 
 See **[Pagination Section](https://github.com/aleMessoMale/sample-routing/#pagination "Pagination Section")** for more info.
 
-The only **version** supported is the v1, and, as you probably already noticed, is part of the exposed path. See **[Integration Section](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")** to better understand how versioning has been managed.
+The only **version** supported is the v1, and, as you probably already noticed, is part of the exposed path. See **[Integration Section](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")** to better understand how versioning has been managed.  
 
-As already said, the web service is secured with **Spring Integration**. Here the **credentials** to provide, with Basic Authentication, in order to consume the exposed rest web service. These are present in the user.properties file:  
+The only **channels** supported are web and mobile. See **[Integration Section](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")** to better understand how multi-channel features have been managed.
+
+As already said, the web service is secured with **Spring Integration**. Here the **credentials** to provide, with Basic Authentication, in order to consume the exposed rest web service. These are present in the [user.properties] file:  
 username: INTEGRATION_REST_USER  
 password: 1Password  
 
@@ -70,7 +88,7 @@ A **Basic Authentication** with [Spring Security][] has been put in place. Provi
 - username: INTEGRATION\_REST\_USER  
 - password: 1Password  
 
-For testing purpose, you can use a Rest Client as [PostMan][] and call the subsequent URL with the GET Http Verb: *http://localhost:8080/rest-integration-sample/services/v1/currency-countries-info?pageSize=10&pageNumber=5*  
+For testing purpose, you can use a Rest Client as [PostMan][] and call the subsequent URL with the GET Http Verb: *http://localhost:8080/rest-integration-sample/services/web/v1/currency-countries-info?pageSize=10&pageNumber=5*  
 
 This is an example of paginated response and returns the fifth page and the page will have a size of ten elements. 
 

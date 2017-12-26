@@ -18,11 +18,11 @@ import org.springframework.web.client.RestTemplate;
 @Profile("test")
 public class ContextLoaderListenerConfigTest {
 	
-	@Bean
-	RestTemplate restTemplate() {
-		RestTemplate restTemplate = new RestTemplate();
-		
-		return restTemplate;
-       
-	}
+//	@Bean
+//	RestTemplate restTemplate() {
+//		RestTemplate restTemplate = new RestTemplate();
+//		
+//		return restTemplate;
+//       
+//	}
 }

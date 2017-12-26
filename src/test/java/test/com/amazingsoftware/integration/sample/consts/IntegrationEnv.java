@@ -13,6 +13,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class IntegrationEnv {
 
+	public String getWebChannel() {
+		return webChannel;
+	}
+
+	public String getMobileChannel() {
+		return mobileChannel;
+	}
+	
+	
+	public void setWebChannel(String channel) {
+		this.webChannel = channel;
+	}
+
+	public void setMobileChannel(String channel) {
+		this.mobileChannel = channel;
+	}
+
 	public void setBaseHost(String baseHost) {
 		this.baseHost = baseHost;
 	}
@@ -79,4 +96,9 @@ public class IntegrationEnv {
 	@Value("${integration.env.currency.version}")
 	private String currencyVersion;
 	
+	@Value("${integration.env.currency.webchannel}")
+	private String webChannel;
+	
+	@Value("${integration.env.currency.mobilechannel}")
+	private String mobileChannel;
 }

@@ -3,6 +3,7 @@ package test.com.amazingsoftware.integration.sample.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.web.client.RestTemplate;
 
 import com.amazingsoftware.integration.samples.arch.restinvokation.impl.ExtendedArchRestServiceSupportImpl;
 import com.amazingsoftware.integration.samples.rest.builder.urlcurrency.IRestCountriesUrlBuilder;
@@ -47,9 +48,19 @@ public class ServiceLayerConfigTest {
 		return new RestCountriesUrlBuilderImpl();
 	}
 	
+	@Bean
+	RestTemplate restTemplate() {
+		RestTemplate restTemplate = new RestTemplate();
+		
+		return restTemplate;
+       
+	}
+
+	
 	@Bean 
 	TestUtils testUtils(){
 		TestUtils testUtils = new TestUtils();
+		testUtils.setRestTemplate(restTemplate());
 		return testUtils;
 	}
 	

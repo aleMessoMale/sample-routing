@@ -15,7 +15,9 @@
  */
 package test.com.amazingsoftware.integration.sample.rest.integration.currency;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +45,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.amazingsoftware.integration.samples.consts.BaseServiceConst;
+import com.amazingsoftware.integration.samples.rest.facade.currency.domain.CurrencyFacadeResponse;
 import com.amazingsoftware.integration.samples.rest.service.currency.domain.CountryInfoServiceResponse;
 import com.amazingsoftware.integration.samples.utils.HttpUtils;
 import com.amazingsoftware.integration.samples.utils.NumberUtil;
@@ -88,11 +91,8 @@ public class CurrencyInfoIntTest {
 	private String springSecurityPassword;
 
 	@Autowired
-	private RestTemplate restTemplate;
-
-	@Autowired
 	private HttpUtils httpUtils;
-
+	
 	@Autowired
 	private TestUtils testUtils;
 
@@ -101,6 +101,9 @@ public class CurrencyInfoIntTest {
 
 	@Rule
 	public ExpectedException exceptionExpected = ExpectedException.none();
+	
+	
+	
 
 	/**
 	 * tests that calling the rest service exposed by the integration test
@@ -112,20 +115,12 @@ public class CurrencyInfoIntTest {
 	@Test
 	public void testCallCountryCurrenciesRestOK() throws Exception {
 
-		final String fullUrl = testUtils.getIntegrationEnvFullUrl();
+		final String fullUrl = testUtils.getWebIntegrationEnvFullUrl();
 		HttpHeaders headers = testUtils.getHttpHeadersWithUserCredentials(springSecurityUsername,
 				springSecurityPassword);
-		HttpEntity<Object> request = new HttpEntity<Object>(headers);
-
-		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
-		};
-
-		ResponseEntity<List<CountryInfoServiceResponse>> exchange;
-
-		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
-
-		exchange = restTemplate.exchange(fullUrl, HttpMethod.GET, request, listOfCountryResponse);
-		List<CountryInfoServiceResponse> countryListResponse = exchange.getBody();
+		
+		ResponseEntity<CurrencyFacadeResponse> exchange = testUtils.executeRestCall(headers,fullUrl,HttpMethod.GET,CurrencyFacadeResponse.class);
+		
 
 		assertTrue(exchange.getStatusCode().equals(HttpStatus.OK));
 
@@ -143,7 +138,7 @@ public class CurrencyInfoIntTest {
 	public void testCallCountryCurrenciesRestWithPaginationReturnsPageSizeElementsWithCorrectContent()
 			throws Exception {
 
-		String fullUrl = testUtils.getIntegrationEnvFullUrl();
+		String fullUrl = testUtils.getWebIntegrationEnvFullUrl();
 
 		final String pageNum = "2";
 		final String pageSize = "10";
@@ -156,23 +151,16 @@ public class CurrencyInfoIntTest {
 
 		HttpHeaders headers = testUtils.getHttpHeadersWithUserCredentials(springSecurityUsername,
 				springSecurityPassword);
-		HttpEntity<Object> request = new HttpEntity<Object>(headers);
-
-		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
-		};
-
-		ResponseEntity<List<CountryInfoServiceResponse>> exchange;
-
 		fullUrl += queryString;
-
-		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
-
-		exchange = restTemplate.exchange(fullUrl, HttpMethod.GET, request, listOfCountryResponse);
-		List<CountryInfoServiceResponse> countryListResponse = exchange.getBody();
+		
+		ResponseEntity<CurrencyFacadeResponse> exchange = testUtils.executeRestCall(headers,fullUrl,HttpMethod.GET,CurrencyFacadeResponse.class);
+		
 
 		assertTrue(exchange.getStatusCode().equals(HttpStatus.OK));
-		assertEquals(NumberUtil.checkIntegerNumber(pageSize, null).intValue(), exchange.getBody().size());
-		assertEquals("Argentina", exchange.getBody().get(0).getName());
+		assertEquals(BaseServiceConst.Channels.WEB_CHANNEL, exchange.getBody().getChannel());
+		assertEquals(testUtils.getIntegrationEnv().getCurrencyVersion(), exchange.getBody().getVersion());
+		assertEquals(NumberUtil.checkIntegerNumber(pageSize, null).intValue(), exchange.getBody().getCountryInfoList().size());
+		assertEquals("Argentina", exchange.getBody().getCountryInfoList().get(0).getName());
 
 	}
 
@@ -188,23 +176,17 @@ public class CurrencyInfoIntTest {
 	@Test
 	public void testCallCountryCurrenciesRestWithNoPaginationReturnsAllElements() throws Exception {
 
-		final String fullUrl = testUtils.getIntegrationEnvFullUrl();
+		final String fullUrl = testUtils.getMobileIntegrationEnvFullUrl();
 		HttpHeaders headers = testUtils.getHttpHeadersWithUserCredentials(springSecurityUsername,
 				springSecurityPassword);
 		HttpEntity<Object> request = new HttpEntity<Object>(headers);
 
-		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
-		};
-
-		ResponseEntity<List<CountryInfoServiceResponse>> exchange;
-
-		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
-
-		exchange = restTemplate.exchange(fullUrl, HttpMethod.GET, request, listOfCountryResponse);
-		List<CountryInfoServiceResponse> countryListResponse = exchange.getBody();
+		ResponseEntity<CurrencyFacadeResponse> exchange = testUtils.executeRestCall(headers,fullUrl,HttpMethod.GET,CurrencyFacadeResponse.class);
 
 		assertTrue(exchange.getStatusCode().equals(HttpStatus.OK));
-		assertEquals(TestConsts.REST_COUNTRIES_RESPONSE_SIZE, exchange.getBody().size());
+		assertEquals(BaseServiceConst.Channels.MOBILE_CHANNEL, exchange.getBody().getChannel());
+		assertEquals(testUtils.getIntegrationEnv().getCurrencyVersion(), exchange.getBody().getVersion());
+		assertEquals(TestConsts.REST_COUNTRIES_RESPONSE_SIZE, exchange.getBody().getCountryInfoList().size());
 
 	}
 
@@ -219,7 +201,7 @@ public class CurrencyInfoIntTest {
 	@Test
 	public void testCallCountryCurrenciesRestReturnsAnEmptyListIfPaginationRequestValuesNotPresent() throws Exception {
 
-		String fullUrl = testUtils.getIntegrationEnvFullUrl();
+		String fullUrl = testUtils.getMobileIntegrationEnvFullUrl();
 
 		String pageNum = "50";
 		String pageSize = "10";
@@ -232,22 +214,16 @@ public class CurrencyInfoIntTest {
 
 		HttpHeaders headers = testUtils.getHttpHeadersWithUserCredentials(springSecurityUsername,
 				springSecurityPassword);
-		HttpEntity<Object> request = new HttpEntity<Object>(headers);
-
-		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
-		};
-
-		ResponseEntity<List<CountryInfoServiceResponse>> exchange;
-
 		fullUrl += queryString;
-
-		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
-
-		exchange = restTemplate.exchange(fullUrl, HttpMethod.GET, request, listOfCountryResponse);
-
+		
+		
+		ResponseEntity<CurrencyFacadeResponse> exchange = testUtils.executeRestCall(headers,fullUrl,HttpMethod.GET,CurrencyFacadeResponse.class);
+		
 		assertNotNull(exchange);
 		assertTrue(exchange.getStatusCode().equals(HttpStatus.OK));
-		assertEquals(new Integer("0").intValue(), exchange.getBody().size());
+		assertEquals(BaseServiceConst.Channels.MOBILE_CHANNEL, exchange.getBody().getChannel());
+		assertEquals(testUtils.getIntegrationEnv().getCurrencyVersion(), exchange.getBody().getVersion());
+		assertEquals(new Integer("0").intValue(), exchange.getBody().getCountryInfoList().size());
 	}
 
 	/**
@@ -261,7 +237,7 @@ public class CurrencyInfoIntTest {
 	@Test
 	public void testCallCountryCurrenciesRestBoundCondition() throws Exception {
 
-		String fullUrl = testUtils.getIntegrationEnvFullUrl();
+		String fullUrl = testUtils.getWebIntegrationEnvFullUrl();
 
 		/* Rest Source size is 250, requested elements are the last 10 */
 		String pageNum = "7";
@@ -275,24 +251,18 @@ public class CurrencyInfoIntTest {
 
 		HttpHeaders headers = testUtils.getHttpHeadersWithUserCredentials(springSecurityUsername,
 				springSecurityPassword);
-		HttpEntity<Object> request = new HttpEntity<Object>(headers);
-
-		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
-		};
-
-		ResponseEntity<List<CountryInfoServiceResponse>> exchange;
-
 		fullUrl += queryString;
-
-		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
-
-		exchange = restTemplate.exchange(fullUrl, HttpMethod.GET, request, listOfCountryResponse);
-
+		
+		
+		ResponseEntity<CurrencyFacadeResponse> exchange = testUtils.executeRestCall(headers,fullUrl,HttpMethod.GET,CurrencyFacadeResponse.class);
+		
 		assertNotNull(exchange);
 		assertTrue(exchange.getStatusCode().equals(HttpStatus.OK));
-		assertEquals(new Integer("10").intValue(), exchange.getBody().size());
-		assertEquals("Uruguay", exchange.getBody().get(0).getName());
-		assertEquals("Zimbabwe", exchange.getBody().get(9).getName());
+		assertEquals(BaseServiceConst.Channels.WEB_CHANNEL, exchange.getBody().getChannel());
+		assertEquals(testUtils.getIntegrationEnv().getCurrencyVersion(), exchange.getBody().getVersion());
+		assertEquals(new Integer("10").intValue(), exchange.getBody().getCountryInfoList().size());
+		assertEquals("Uruguay", exchange.getBody().getCountryInfoList().get(0).getName());
+		assertEquals("Zimbabwe", exchange.getBody().getCountryInfoList().get(9).getName());
 
 	}
 
@@ -308,7 +278,7 @@ public class CurrencyInfoIntTest {
 	public void testCallCountryCurrenciesRestWithInconsistentQueryStringParamReturnsInternalServerError()
 			throws Exception {
 
-		String fullUrl = testUtils.getIntegrationEnvFullUrl();
+		String fullUrl = testUtils.getWebIntegrationEnvFullUrl();
 
 		final String pageNum = "2";
 
@@ -320,19 +290,11 @@ public class CurrencyInfoIntTest {
 
 		HttpHeaders headers = testUtils.getHttpHeadersWithUserCredentials(springSecurityUsername,
 				springSecurityPassword);
-		HttpEntity<Object> request = new HttpEntity<Object>(headers);
-
-		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
-		};
-
-		ResponseEntity<List<CountryInfoServiceResponse>> exchange;
-
 		fullUrl += queryString;
-
-		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
-
+		
 		try {
-			exchange = restTemplate.exchange(fullUrl, HttpMethod.GET, request, listOfCountryResponse);
+			ResponseEntity<CurrencyFacadeResponse> exchange = testUtils.executeRestCall(headers, fullUrl, HttpMethod.GET,
+					CurrencyFacadeResponse.class);
 		} catch (org.springframework.web.client.HttpServerErrorException e) {
 			assertTrue(e.getStatusCode().equals(HttpStatus.INTERNAL_SERVER_ERROR));
 		}
@@ -351,7 +313,7 @@ public class CurrencyInfoIntTest {
 	public void testCallCountryCurrenciesRestWithNotANumberQueryStringParamReturnInternalServerError()
 			throws Exception {
 
-		String fullUrl = testUtils.getIntegrationEnvFullUrl();
+		String fullUrl = testUtils.getWebIntegrationEnvFullUrl();
 
 		final String pageNum = "33xx";
 		final String pageSize = "aa";
@@ -365,21 +327,16 @@ public class CurrencyInfoIntTest {
 
 		HttpHeaders headers = testUtils.getHttpHeadersWithUserCredentials(springSecurityUsername,
 				springSecurityPassword);
-		HttpEntity<Object> request = new HttpEntity<Object>(headers);
-
-		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
-		};
-
-		ResponseEntity<List<CountryInfoServiceResponse>> exchange = null;
-
 		fullUrl += queryString;
 
-		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
+		
 		try {
-			exchange = restTemplate.exchange(fullUrl, HttpMethod.GET, request, listOfCountryResponse);
+			ResponseEntity<CurrencyFacadeResponse> exchange = testUtils.executeRestCall(headers, fullUrl, HttpMethod.GET,
+					CurrencyFacadeResponse.class);
 		} catch (HttpServerErrorException e) {
 			assertTrue(e.getStatusCode().equals(HttpStatus.INTERNAL_SERVER_ERROR));
 		}
+		
 
 	}
 	/**
@@ -391,20 +348,13 @@ public class CurrencyInfoIntTest {
 	@Test
 	public void testCallCountryCurrenciesRestWithWrongCredendialsReturnsUnAuthCode401Code() throws Exception {
 
-		final String fullUrl = testUtils.getIntegrationEnvFullUrl();
+		final String fullUrl = testUtils.getWebIntegrationEnvFullUrl();
 		HttpHeaders headers = testUtils.getHttpHeadersWithUserCredentials(springSecurityUsername,
 				springSecurityPassword + "Wxx");
-		HttpEntity<Object> request = new HttpEntity<Object>(headers);
-
-		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
-		};
-
-		ResponseEntity<List<CountryInfoServiceResponse>> exchange = null;
-
-		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
 
 		try {
-			exchange = restTemplate.exchange(fullUrl, HttpMethod.GET, request, listOfCountryResponse);
+			ResponseEntity<CurrencyFacadeResponse> exchange = testUtils.executeRestCall(headers, fullUrl, HttpMethod.GET,
+					CurrencyFacadeResponse.class);
 		} catch (org.springframework.web.client.HttpClientErrorException e) {
 			assertTrue(e.getStatusCode().equals(HttpStatus.UNAUTHORIZED));
 		}
@@ -413,7 +363,7 @@ public class CurrencyInfoIntTest {
 	/**
 	 * tests that calling the rest service exposed by the integration test
 	 * environment with the wrong version, a 404, resource not available, is returned
-	 * with a specific error message - version not supported.
+	 * 
 	 * 
 	 * @throws Exception
 	 */
@@ -423,25 +373,49 @@ public class CurrencyInfoIntTest {
 		IntegrationEnv env = testUtils.getIntegrationEnv();
 		env.setCurrencyVersion("v2");
 
-		final String fullUrl = testUtils.getIntegrationEnvFullUrl();
+		final String fullUrl = testUtils.getWebIntegrationEnvFullUrl();
 
 		HttpHeaders headers = testUtils.getHttpHeadersWithUserCredentials(springSecurityUsername,
 				springSecurityPassword);
-		HttpEntity<Object> request = new HttpEntity<Object>(headers);
-
-		ParameterizedTypeReference<List<CountryInfoServiceResponse>> listOfCountryResponse = new ParameterizedTypeReference<List<CountryInfoServiceResponse>>() {
-		};
-
-		ResponseEntity<List<CountryInfoServiceResponse>> exchange = null;
-
-		logger.info("Calling with URI: {} and Request {} ", fullUrl, request);
-
+		
 		try {
-			exchange = restTemplate.exchange(fullUrl, HttpMethod.GET, request, listOfCountryResponse);
+			ResponseEntity<CurrencyFacadeResponse> exchange = testUtils.executeRestCall(headers, fullUrl, HttpMethod.GET,
+					CurrencyFacadeResponse.class);
 		} catch (org.springframework.web.client.HttpClientErrorException e) {
 			assertTrue(e.getStatusCode().equals(HttpStatus.NOT_FOUND));
 		} finally {
 			env.setCurrencyVersion("v1");
+		}
+
+
+	}
+	
+	
+	/**
+	 * tests that calling the rest service exposed by the integration test
+	 * environment with the wrong channel, a 404, resource not available, is returned
+	 * with a specific error message - channel not supported.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testCallCountryCurrenciesRestWithWrongChannelReturns404() throws Exception {
+
+		IntegrationEnv env = testUtils.getIntegrationEnv();
+		env.setWebChannel("pippoChannel");
+
+		final String fullUrl = testUtils.getWebIntegrationEnvFullUrl();
+
+		HttpHeaders headers = testUtils.getHttpHeadersWithUserCredentials(springSecurityUsername,
+				springSecurityPassword);
+
+		try {
+			ResponseEntity<CurrencyFacadeResponse> exchange = testUtils.executeRestCall(headers, fullUrl, HttpMethod.GET,
+					CurrencyFacadeResponse.class);
+		} catch (org.springframework.web.client.HttpClientErrorException e) {
+			assertTrue(e.getStatusCode().equals(HttpStatus.NOT_FOUND));
+		} finally {
+			env.setWebChannel("web");
 		}
 
 	}
