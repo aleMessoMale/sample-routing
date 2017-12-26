@@ -159,7 +159,7 @@ This extract has been taken from the whole spring security configuration [file](
 The access to the service activator method is secured and the caller must be authenticated with a role of ROLE_INTEGRATION_REST_USER as shown below:
 
 ```java
-@Override
+	@Override
 	@Secured("ROLE_INTEGRATION_REST_USER")
 	public GenericMessage<CurrencyFacadeResponse> getCurrenciesInfoForWeb(Message<?> inMessage) throws Exception {
 
