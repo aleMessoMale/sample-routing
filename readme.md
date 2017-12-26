@@ -381,7 +381,7 @@ As shown in the first extract, any error raised is automatically redirected to t
 
 
 ```java
- 	@ServiceActivator
+  @ServiceActivator
     public Message<ErrorResponse> handleError(Message<MessageHandlingException> message) {
     	
     	Map<String, Object> responseHeaderMap = new HashMap<String, Object>();
