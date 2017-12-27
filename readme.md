@@ -105,7 +105,7 @@ This project is composed by these layers:
 - *Web*: A servlet is called in order to fill the MDC Context of [LogBack] and allow a better logging experience. For more info See [here](./src/main/java/com/amazingsoftware/integration/samples/web/MDCInsertingServletFilter.java) the Servlet which fills the MDC Context, the whole [logback.xml](./src/main/resources/logback.xml) file or the specific **[Logs Section](https://github.com/aleMessoMale/sample-routing/#logs "Logs Section")**.  
 - *Integration*: An Integration layer through [Spring Integration] has been put in place in order to orchestrate correctly messages send to the exposed Rest Web Service, managing different versions and channels. For more info see the Spring Configuration file for the Integration features [here](./src/main/resources/META-INF/spring/integration/application-spring-integration.xml) or the relative [Integration Section](https://github.com/aleMessoMale/sample-routing/#integration "Integration Section")  
 - *Facade*: A facade layer has been put in place in order to make easier the interaction with the below service layer.  
-- *Service*: A Service layer has been put in place. This layer is responsible for most of the business logic creating decoupling with the above Facade Layer.
+- *Service*: A Service layer has been put in place. This layer is responsible for most of the business logic creating decoupling with the above Facade Layer and is not deliberately aware of the channel's call is serving.
 
 An arch package has been written to manage most common operations such as logging, errors, mapping between layers and rest invokation.  
 
